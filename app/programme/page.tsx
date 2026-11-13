@@ -1,0 +1,3 @@
+import {Shell} from '@/components/Shell';import {getSupabaseServer,hasConfig} from '@/lib/supabase/server';import {Schedule} from './schedule';
+export const dynamic='force-dynamic';
+export default async function Page(){let sessions:any[]=[];if(hasConfig()){const db=await getSupabaseServer();const r=await db.from('sessions').select('id,title,description,starts_at,ends_at,session_type,room').eq('published',true).order('starts_at');sessions=r.data||[]}return <Shell title="Scientific programme" kicker="22–25 FEBRUARY 2027"><p>Filter by conference day and session format. Sessions and exact venues will appear after approval.</p><Schedule sessions={sessions}/></Shell>}
