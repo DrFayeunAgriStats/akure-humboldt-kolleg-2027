@@ -1,0 +1,1 @@
+'use client';import {createBrowserClient} from '@supabase/ssr';export function SignOut(){return <button className="app-button app-btn-secondary" onClick={async()=>{const url=process.env.NEXT_PUBLIC_SUPABASE_URL, key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(url&&key){const db=createBrowserClient(url,key);await db.auth.signOut()}location.href='/';}}>Sign out</button>}
