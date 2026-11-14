@@ -1,3 +1,3 @@
 export const metadata = { title: "Participant Login", description: "Secure email sign-in for Akure Humboldt Kolleg 2027 participants and organisers." };
 import {Shell} from '@/components/Shell';import {LoginForm} from './form';
-export default function Page(){return <Shell title="Sign in to the conference portal" kicker="SECURE PARTICIPANT & STAFF ACCESS"><p>Sign in using a one-time email link. Organiser and reviewer accounts need an assigned role.</p><LoginForm /></Shell>}
+export default function Page(){return <Shell title="Sign in to the conference portal" kicker="SECURE PARTICIPANT & STAFF ACCESS"><p>Sign in using a one-time email link to try the registration and abstract workflows. This is a bid demonstration; test records may be removed before official launch. Organiser and reviewer access still requires an assigned staff role. Read the <a href="/privacy">demo privacy notice</a>.</p><LoginForm /></Shell>}
