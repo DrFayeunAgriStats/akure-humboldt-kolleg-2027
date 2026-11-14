@@ -1,0 +1,18 @@
+# Akure Humboldt Kolleg 2027 — asset sources and attribution
+
+The client confirms **FUTA as host** and **the Alexander von Humboldt Foundation as sponsor**, with permission to show the Humboldt logo. Conference registration and abstract submission remain CLOSED pending acceptance testing. The specific conference hall remains unconfirmed.
+
+| Asset | Display | Source and provenance | Notes |
+|---|---|---|---|
+| FUTA crest | External institutional crest URL, shown in the host band and partner section | https://space4water.org/s4w/web/sites/default/files/images/organizations/logos/2024-08/AU%2BREC%2Blogos%2B-%2B2022-03-31T140738.693.png ; the same crest design also appears in FUTA-hosted letterhead PDFs, e.g. https://www.futa.edu.ng/futacms/media/page_images/cce/content/files_CCE_1699973442.pdf | This is a partner-hosted copy of FUTA's crest, not a downloaded file from FUTA's server. Use a locally supplied official crest when available to avoid reliance on hotlinking. |
+| Alexander von Humboldt Foundation logo | External official SVG URL in both institution sections | https://www.humboldt-foundation.de/fileadmin/Entdecken/Organisation/Styleguide/Logo/AvH_Logo_rgb.svg — official source: https://www.humboldt-foundation.de/en/explore/organisation/corporate-design | Client confirms permission; do not redraw, alter, crop or separate word mark. Use the RGB version only for online use. Keep sponsor permission on file. |
+| FUTA auditorium gathering photograph | Homepage venue section and gallery | https://elearning.futa.edu.ng/pluginfile.php/1/theme_almondb/sliderimage1/1702478836/353664631_628260345993702_4823266618091717554_n.jpg — FUTA's own e-learning site | Real FUTA image; **the specific auditorium in the photograph has not been independently identified**. Do not claim it is a verified photograph of Obafemi Awolowo Auditorium. Host to project storage after organisers secure an approved copy. |
+| FUTA 2,500-capacity main auditorium | Descriptive venue text | https://mail.futa.edu.ng/news/705-call-for-nominations-for-naming-of-some-buildings-and-streets ; https://www.futa.edu.ng/news/949-futa-hosts-jupeb-annual-workshop-for-tutors | University and event records support the building's existence and name. The exact Kolleg meeting room has not been confirmed. |
+| Rebuilt FUTA South Gate | Photographic slot with official news link; no false photograph | https://www.futa.edu.ng/news/1349-futa-south-gate-to-wear-new-look ; September 2026 university-affiliated post mirrored at https://www.schoolandcollegelistings.com/NG/Akure/300367729983809/Federal-University-of-Technology-Akure-%28FUTA%29 | Official article establishes works; the new physical gate image is still **not reliably identified or downloadable**. Do NOT use an older gate photograph or an unrelated rendering as the completed South Gate. |
+| Rainforest concept artwork | Existing hero and content sections | Project's existing original concept artwork `public/assets/*.webp` | Conceptual artwork, not a photograph of a particular FUTA location. |
+
+## Publication note
+
+The external image URLs above keep a traceable link to each source, but hotlinked assets are vulnerable to removal or blocking. For production durability, the FUTA organisers should supply the actual approved original files, which can then be committed under `public/branding/` and `public/images/` with photographer attribution. The external links are used until authentic and cleared copies are available.
+
+For the new South Gate in particular: request a recently captured campus publicity photograph, ideally credited to FUTA Corporate Affairs, and save as `public/images/futa-south-gate-new.webp`. Once sourced, replace the explanatory placeholder while maintaining truthful captions.
