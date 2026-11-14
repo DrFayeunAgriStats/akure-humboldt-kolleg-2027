@@ -139,3 +139,14 @@ footer{background:#0b2b23;color:#d1e0d1;padding:60px 0 20px}.footer-grid{display
   .venue-photo>div strong{font-size:19px}
   .venue-photo .photo-credit{font-size:9px;padding:8px 10px}
 }
+
+/* Editorial revision: concise programme presentation and accessible venue framing. */
+.programme-summary {max-width:850px; margin:28px 0 0; padding:27px 30px; background:#fffefa; border-left:3px solid #7b9c7d; box-shadow:0 12px 30px rgba(17,49,40,.05);}
+.programme-summary p {color:#435b49; line-height:1.75; font-size:15px; margin:0 0 15px;}
+.programme-summary .notice-copy {font-size:12px; color:#778c7e; margin-bottom:10px;}
+.programme-summary .text-link {display:inline-block; margin-top:8px;}
+.venue-photo {margin:0;}
+.venue-photo .photo-credit {display:block;}
+.theme-grid .theme-card {display:flex; flex-direction:column; justify-content:flex-start;}
+.theme-card h3 {margin-top:12px;}
+@media(max-width:650px){.programme-summary {padding:22px 20px;}.programme-summary p {font-size:14px;}}
