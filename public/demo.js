@@ -32,22 +32,6 @@
     menuButton?.setAttribute('aria-expanded', 'false');
   }));
 
-  // Countdown; Feb 22, 2027 midnight WAT (UTC+1).
-  const eventEpoch = Date.parse(window.AKH_EVENT_START || '2027-02-22T00:00:00+01:00');
-  function updateCountdown() {
-    const remaining = Math.max(0, eventEpoch - Date.now());
-    const days = Math.floor(remaining / 86400000);
-    const hours = Math.floor((remaining % 86400000) / 3600000);
-    const minutes = Math.floor((remaining % 3600000) / 60000);
-    const seconds = Math.floor((remaining % 60000) / 1000);
-    text($('#cd-days'), String(days).padStart(2, '0'));
-    text($('#cd-hours'), String(hours).padStart(2, '0'));
-    text($('#cd-mins'), String(minutes).padStart(2, '0'));
-    text($('#cd-secs'), String(seconds).padStart(2, '0'));
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
   const registrationForm = $('#registration-form');
   const registrationSteps = [$('#reg-details'), $('#reg-review'), $('#reg-success')];
   const stepIndicators = [$('#reg-step-one'), $('#reg-step-two'), $('#reg-step-three')];
