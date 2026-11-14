@@ -1,7 +1,7 @@
 import {Shell} from '@/components/Shell';
 import {RegisterForm} from './form';
 import {hasConfig} from '@/lib/supabase/server';import {registrationEnabled,BID_DEMO_MODE} from '@/lib/conference-mode';
-export const metadata = { title: "Registration", description: "Registration for Akure Humboldt Kolleg 2027 is free of charge and will open after committee approval." };
+export const metadata = { title: "Registration", description: "Try the working no-fee registration flow for the Akure Humboldt Kolleg 2027 bidding demonstration. Not official registration." };
 export const dynamic='force-dynamic';
 export default function Page(){
  const isOpen=registrationEnabled()&&hasConfig();
