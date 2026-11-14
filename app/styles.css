@@ -24,3 +24,49 @@ footer{background:#0b2b23;color:#d1e0d1;padding:60px 0 20px}.footer-grid{display
 .production-nav a{color:#134632;border-bottom:1px solid #72977e} .production-nav .prod-disabled{color:#6b7a70}
 .application-shell{min-height:70vh;max-width:1100px;margin:auto;padding:56px 22px}.application-shell h1{font-size:clamp(34px,4.5vw,58px)}.app-form{background:#fff;padding:30px;border:1px solid #dfe6dc;box-shadow:0 20px 50px #0a291218;border-radius:12px;max-width:680px}.app-form label{display:block;font-weight:700;font-size:13px;margin:15px 0}.app-form input,.app-form select,.app-form textarea{display:block;width:100%;border:1px solid #bfd0bf;border-radius:6px;padding:11px;margin-top:6px;color:#1f342e;background:white}.app-form input[type=checkbox]{display:inline;width:auto;margin-right:10px}.app-form button,.app-button{display:inline-flex;border:0;background:#163f36;color:white;border-radius:6px;padding:13px 19px;font-weight:700;cursor:pointer;align-items:center;gap:8px}.app-form button:disabled{opacity:.6;cursor:not-allowed}.message{padding:14px 18px;border-radius:8px;background:#edf3e8;margin:15px 0}.message.warn{background:#fff0d7}.message.error{background:#fee6e6}.plain-card{background:#fff;border:1px solid #dfe6dc;border-radius:11px;padding:22px;margin:12px 0}.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.eyebrow-small{color:#5b7765;font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:800}.styled-table{width:100%;min-width:650px;border-collapse:collapse}.styled-table th,.styled-table td{padding:12px;border-bottom:1px solid #e7ebe6;text-align:left;vertical-align:top}.styled-table td{font-size:13px}.app-topbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 18px}.app-topbar a{border:1px solid #cadbcb;padding:10px 13px;border-radius:7px;font-size:13px}.app-footer{padding:20px;text-align:center;color:#799181;font-size:11px;background:#0b2b23}.app-footer a{color:#c8dbcb}.help{font-size:12px;color:#6c8571}.pill{font-weight:700;border-radius:20px;padding:5px 10px;background:#e5ecdd;color:#395742;font-size:11px}.field-help{font-size:11px;color:#657a6a}.app-input-inline{max-width:180px;padding:8px!important}.filter-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:20px 0}.filter-row select{padding:9px;border:1px solid #bdcebd;background:white}.app-form .checkbox-row{display:flex;align-items:start;gap:8px;font-weight:500}.app-form .checkbox-row input{margin-top:5px}.app-alert{border-left:4px solid #7d9a6e;padding:14px;background:#ebf2e8;margin:16px 0}.app-btn-secondary{background:#eef3ec!important;color:#215642!important;border:1px solid #bfd1c1!important}.app-login{min-height:60vh}.header-mini{background:#fffefa;border-bottom:1px solid #dfe6dc;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}.header-mini a{color:#143f35;font-size:13px;font-weight:700}.header-mini nav{display:flex;gap:15px;flex-wrap:wrap}.app-table-scroll{overflow-x:auto}
 @media(max-width:700px){.application-shell{padding:32px 16px}.app-form{padding:18px}.header-mini{flex-direction:column;align-items:start}.production-nav{font-size:11px}}
+
+/* Institutional branding: proposed host (FUTA) + sponsor (Alexander von Humboldt Foundation) */
+.inst-bar{background:#fffefa;border-top:1px solid #eef1ea;border-bottom:1px solid #e3e8df;position:relative;z-index:20}
+.inst-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:78px;padding:10px 0}
+.inst-item{display:flex;align-items:center;gap:14px;min-width:0;color:var(--ink);border-radius:6px}
+.inst-item:focus-visible,.partner-card:focus-visible{outline:2px solid #577f65;outline-offset:4px}
+.inst-text{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.inst-text-right{text-align:right}
+.inst-text small{font:700 10px/1.4 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#607e68}
+.inst-text strong{font:700 13px/1.35 'Manrope',sans-serif;color:#1f342e}
+.inst-divider{flex:1;height:1px;background:linear-gradient(90deg,transparent,#d2ad6e,transparent);max-width:220px}
+.inst-logo{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
+.inst-logo img{display:block;width:auto;height:auto;max-width:100%}
+.inst-logo-futa img{height:56px;width:56px;object-fit:contain}
+.inst-logo-avh{padding:6px}
+.inst-logo-avh img{height:52px;width:auto}
+.inst-logo-lg.inst-logo-futa img{height:88px;width:88px}
+.inst-logo-lg.inst-logo-avh img{height:76px}
+.inst-fallback{display:none;font:700 12px/1.3 'Manrope',sans-serif;color:#1f342e;padding:8px 12px;border:1px solid #d7dfd4;border-radius:4px}
+.logo-missing .inst-fallback{display:inline-block}
+@media(max-width:850px){.inst-divider{display:none}.inst-inner{flex-direction:column;align-items:flex-start;gap:12px;padding:14px 0}.inst-item{flex-wrap:wrap;row-gap:8px}.inst-item:last-child{flex-direction:row-reverse;justify-content:flex-end}.inst-text{flex:1 1 180px}.inst-text-right{text-align:left}.inst-logo-futa img{height:46px;width:46px}.inst-logo-avh img{height:42px}.inst-text strong{font-size:12.5px}}
+
+/* Partners */
+.partner-cards{display:grid;gap:16px}
+.partner-card{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:22px;align-items:center;background:#fff;border:1px solid #e1e7dd;padding:22px 26px;box-shadow:var(--shadow);transition:border-color .2s}
+.partner-card:hover{border-color:#b9cbb5}
+.partner-card .inst-logo{grid-row:1/3;max-width:260px}
+.partner-role{font:700 10px/1.4 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#a07f3f;align-self:end}
+.partner-card strong{font:700 15px/1.4 'Manrope',sans-serif;color:#1f342e;align-self:start}
+.partner-placeholder-sm{padding:18px 22px}
+@media(max-width:650px){.partner-card{grid-template-columns:1fr;row-gap:10px}.partner-card .inst-logo{grid-row:auto;justify-self:start}.inst-logo-lg.inst-logo-avh img{height:58px}.inst-logo-lg.inst-logo-futa img{height:72px;width:72px}}
+
+/* Venue gallery (2 columns desktop, 1 column mobile) */
+.venue-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-top:64px}
+.venue-slot{margin:0;background:#fff;border:1px solid #e1e7dd}
+.venue-slot-frame{aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:24px;background:repeating-linear-gradient(135deg,#eef3ea 0 14px,#f6f8f2 14px 28px);border-bottom:1px dashed #b7c8b7;color:#4d6654}
+.venue-slot-frame strong{font:700 14px/1.4 'Manrope',sans-serif;color:#2e4a3c}
+.venue-slot-frame small{font-size:12px;color:#6c7d71;max-width:300px}
+.venue-slot-mark{font-size:26px;color:#d2ad6e}
+.venue-slot img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.venue-slot figcaption{padding:16px 20px 20px;display:flex;flex-direction:column;gap:4px}
+.venue-slot figcaption strong{font:700 14px/1.4 'Manrope',sans-serif;color:#1f342e}
+.venue-slot figcaption span{font-size:12.5px;color:#6c7d71;line-height:1.55}
+@media(max-width:850px){.venue-gallery{grid-template-columns:1fr;gap:20px;margin-top:44px}}
+
+.venue-photo>div{bottom:52px}
