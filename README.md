@@ -4,9 +4,15 @@ Prepared by **Able-Flourish Digital Solutions**. Next.js 16 App Router source ba
 
 **Important:** The conference is **free / fully sponsored**. There is **no Paystack integration, payment gateway, fee table, payment verification, receipt or payment field**. A participant only needs an account and a free registration reference; abstract submission is optional.
 
-## Current status
+## Current status — functional bid demonstration (November 2026)
 
-The source is prepared for installation and staging, **not deployed or end-to-end tested**. The connected Vercel plugin does not have access to create this project; use Vercel import for the staging branch. The dedicated Field-to-Insight Supabase project is provisioned and migrations have been applied; live application integration and privacy testing remain pending. The public demo is **fictional and in-memory only**; its forms are not linked to the database.
+This branch opens **working TEST registration and abstract submission**, backed by the dedicated, otherwise empty, Supabase project `vfihhakkeoaskfumgsbw`, not any AFDS production application. The homepage, registration/abstract forms, user portal, programme, abstract book and staff interfaces remain active. The bid demonstration is explicitly **not official conference registration**; all test entries carry an `is_demo` flag and `DEMO-` references and may be deleted before launch. No payment is collected.
+
+A separate browser-only guided demo remains at `/prototype.html` for committee members who want to inspect all roles without submitting data. Role-controlled **real** organiser and reviewer dashboards still require trusted staff accounts; staff privileges are never open to self-serve visitors.
+
+The public Supabase URL and publishable key are included as safe client-facing fallbacks, not secret keys. Confirm the live Supabase Auth URL allowlist, authentication email rate limits, and project deployment before asking outside participants to test. The Vercel connection available in this chat could not read the conference project environment settings.
+
+See `BID_DEMO_RUNBOOK.md` for the demo-to-official-launch transition and cleanup instructions.
 
 ## Local development
 
@@ -44,6 +50,6 @@ The source is prepared for installation and staging, **not deployed or end-to-en
 
 ## Publicity and governance
 
-The Kolleg is still **proposed**; confirm host permissions, institutional logos, speakers, dates and location with the organising committee before replacing placeholders. Do not use fictional names or displayed sample statistics as factual reporting. The website may be visible to prospective organisers with the demonstration banner; the actual database remains OFF until explicitly activated.
+The Kolleg is still **proposed**; confirm host permissions, institutional logos, speakers, dates and location with the organising committee before replacing placeholders. Do not use fictional names or displayed sample statistics as factual reporting. The website is a working bid demonstration and test records are separately flagged. No test records should be treated as official conference applications.
 
 See `DEPLOYMENT_HANDOVER.md` for the fastest staging sequence.
