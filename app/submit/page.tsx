@@ -1,7 +1,7 @@
 import {Shell} from '@/components/Shell';
 import {AbstractForm} from './form';
 import {hasConfig} from '@/lib/supabase/server';import {submissionsEnabled,BID_DEMO_MODE} from '@/lib/conference-mode';
-export const metadata = { title: "Call for Abstracts", description: "Abstracts of 250–300 words under five scientific sub-themes. Submission is free and opens after committee approval." };
+export const metadata = { title: "Call for Abstracts", description: "Abstracts of 250–300 words under five scientific sub-themes. Test the free, working abstract-submission flow during the bidding demonstration. Not official submission." };
 export const dynamic='force-dynamic';
 export default function Page(){
  const isOpen=submissionsEnabled()&&hasConfig();
