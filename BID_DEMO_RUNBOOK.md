@@ -18,3 +18,9 @@ The conference application is an **interactive bid demonstration**, not an offic
 6. Open the official `registration_open` and `submissions_open` database flags and application environment switches only after live acceptance tests.
 
 **No automated destructive reset is provided**: never run a blanket `DELETE FROM` or truncate the project in response to a routine website release.
+
+## Deploy trigger — November 15, 2026
+
+The latest production branch contains the authenticated functional-demo workflow, the dedicated conference Supabase connection and the `/privacy` page. This documentation change is a **safe deployment trigger** for Vercel's existing GitHub-to-production integration, following earlier build-rate-limited attempts; it does not modify application behaviour or disclose credentials.
+
+After deploying, verify the public `/register` and `/submit` pages display **Working demonstration**, and test email-link login, a trial registration, abstract submission and authorised organiser review. In Supabase Auth, ensure the live domain's `/auth/callback` is allowed before issuing email invitations. Do not publish real manuscripts as test data.
