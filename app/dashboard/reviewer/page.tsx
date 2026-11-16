@@ -25,7 +25,7 @@ export default async function Page(){
       .select('assignment_id,relevance,rigour,clarity,impact,recommendation,comments')
       .eq('reviewer_id',reviewer.id)
   ]);
-  const existing=new Map((reviews.data||[]).map(r=>[r.assignment_id,r as ExistingReview]));
+  const existing=new Map<string,ExistingReview>((reviews.data||[]).map((r:ExistingReview):[string,ExistingReview]=>[r.assignment_id,r]));
   const papers=await Promise.all((assignments.data||[]).map(async (x:any)=>{
     const path=x.abstracts?.file_path as string|null|undefined;
     const link=path?await db.storage.from('abstract-files').createSignedUrl(path,180):null;

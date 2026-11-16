@@ -19,8 +19,8 @@ export default async function Page(){
     db.from('reviews').select('assignment_id,reviewer_id,relevance,rigour,clarity,impact,recommendation,comments,updated_at').limit(1000),
     db.rpc('conference_reviewer_directory')
   ]);
-  const reviewerNames=new Map((directory.data||[]).map((x:{user_id:string;user_email:string})=>[x.user_id,x.user_email]));
-  const assignmentIndex=new Map((assignments.data||[]).map(x=>[x.id,x]));
+  const reviewerNames=new Map<string,string>((directory.data||[]).map((x:{user_id:string;user_email:string}):[string,string]=>[x.user_id,x.user_email]));
+  const assignmentIndex=new Map<string,{id:string;abstract_id:string;reviewer_id:string}>((assignments.data||[]).map((x:{id:string;abstract_id:string;reviewer_id:string}):[string,{id:string;abstract_id:string;reviewer_id:string}]=>[x.id,x]));
   const reports=(reviews.data||[]).flatMap(r=>{
     const assignment=assignmentIndex.get(r.assignment_id);
     if(!assignment)return [];
