@@ -170,3 +170,17 @@ html{scroll-padding-top:115px}
 .app-toast-close{appearance:none;background:transparent;border:0;color:#46574b;font-size:23px;line-height:1;padding:0 4px;cursor:pointer}
 .app-toast-close:focus-visible{outline:2px solid #547b99;outline-offset:3px}
 @media(max-width:640px){.app-toast-stack{top:auto;bottom:max(14px,env(safe-area-inset-bottom));left:12px;right:12px;width:auto}}
+
+
+/* Interactive venue map: campus-level location, not an unconfirmed lecture hall. */
+.venue-map-wrap{margin-top:48px}
+.venue-map-heading{display:flex;gap:28px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.venue-map-heading .eyebrow{margin-bottom:10px}
+.venue-map-heading h3{font:700 clamp(21px,2.5vw,29px)/1.3 'Manrope',Arial,sans-serif;margin:0 0 8px;color:var(--dark)}
+.venue-map-heading p{max-width:770px;color:var(--muted);line-height:1.7;font-size:13px;margin:0}
+.venue-map-directions{flex-shrink:0;white-space:nowrap}
+.venue-map-frame{overflow:hidden;position:relative;height:370px;border-radius:11px;border:1px solid var(--line);background:#e4e8df;box-shadow:var(--shadow)}
+.venue-map-frame iframe{display:block;width:100%;height:100%;border:0}
+.venue-map-footer{display:flex;gap:14px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:11px;line-height:1.5;color:var(--muted)}
+.venue-map-footer a{text-decoration:underline;text-underline-offset:2px;font-weight:700;color:var(--green)}
+@media(max-width:700px){.venue-map-wrap{margin-top:32px}.venue-map-heading{align-items:flex-start;flex-direction:column;gap:15px}.venue-map-frame{height:300px}.venue-map-directions{width:100%;justify-content:center}}
