@@ -184,3 +184,24 @@ html{scroll-padding-top:115px}
 .venue-map-footer{display:flex;gap:14px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:11px;line-height:1.5;color:var(--muted)}
 .venue-map-footer a{text-decoration:underline;text-underline-offset:2px;font-weight:700;color:var(--green)}
 @media(max-width:700px){.venue-map-wrap{margin-top:32px}.venue-map-heading{align-items:flex-start;flex-direction:column;gap:15px}.venue-map-frame{height:300px}.venue-map-directions{width:100%;justify-content:center}}
+
+
+/* Scientific review, organiser controls and an accessible programme preview */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.app-inline-form{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px}
+.app-inline-form label{font-size:13px;font-weight:700}
+.app-inline-form input{flex:1;min-width:min(230px,100%);padding:11px 13px;border:1px solid #bfd0bf;border-radius:6px}
+.app-assign-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.app-assign-row .app-button{padding:8px 11px;font-size:12px}
+.app-review-details{margin:8px 0;border:1px solid var(--line);border-radius:7px;padding:8px}
+.app-review-details summary{cursor:pointer;color:var(--green);font-size:12px;font-weight:700}
+.app-review-details p{margin:9px 0 0;font-size:12px}
+.conference-admin .app-form{margin-top:20px}
+.conference-admin .app-form h3{font-size:20px;margin-bottom:14px}
+.conference-admin .plain-card h2{font-size:clamp(26px,3.5vw,34px)}
+.app-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.app-day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:19px 0}
+.app-day-tabs button{border:1px solid #b8cfb9;color:var(--green);background:white;padding:10px 16px;border-radius:6px;font-weight:700;font-size:13px}
+.app-day-tabs button.active{background:var(--green);color:white}
+.app-day-tabs button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:700px){.app-field-grid{grid-template-columns:1fr}.app-assign-row{align-items:stretch}.app-day-tabs button{flex:1;min-width:calc(50% - 8px)}}

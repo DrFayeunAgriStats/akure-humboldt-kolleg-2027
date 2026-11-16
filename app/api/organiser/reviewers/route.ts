@@ -1,2 +1,13 @@
-import {NextResponse} from 'next/server';import {error} from '@/lib/api';import {getSupabaseServer,requireRole} from '@/lib/supabase/server';import {getAdminClient} from '@/lib/supabase/admin';
-export async function GET(){const user=await requireRole('organiser').catch(()=>null);if(!user)return error('Organiser permission required',403);const db=await getSupabaseServer();const roles=await db.from('user_roles').select('user_id').eq('role','reviewer').limit(100);if(roles.error)return error('Could not list reviewers',500);const admin=process.env.SUPABASE_SECRET_KEY?getAdminClient():null;const reviewerList=await Promise.all((roles.data||[]).map(async ({user_id})=>{const u=admin?await admin.auth.admin.getUserById(user_id):null;return {id:user_id,email:u?.data.user?.email||'Reviewer '+user_id.slice(0,8)}}));return NextResponse.json({reviewers:reviewerList},{headers:{'Cache-Control':'no-store'}})}
+import {NextResponse} from 'next/server';
+import {error} from '@/lib/api';
+import {getSupabaseServer,requireRole} from '@/lib/supabase/server';
+
+export async function GET(){
+  const user=await requireRole('organiser').catch(()=>null);
+  if(!user)return error('Organiser access required.',403);
+  const db=await getSupabaseServer();
+  const {data,error:queryError}=await db.rpc('conference_reviewer_directory');
+  if(queryError)return error('Could not load authorised reviewers.',500);
+  const reviewers=(data||[]).map((r:{user_id:string;user_email:string})=>({id:r.user_id,email:r.user_email}));
+  return NextResponse.json({reviewers},{headers:{'Cache-Control':'no-store'}});
+}

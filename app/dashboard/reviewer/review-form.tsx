@@ -1,1 +1,44 @@
-'use client';import {FormEvent,useState} from 'react';import {useToast} from '@/components/ToastProvider';export function ReviewForm({assignmentId}:{assignmentId:string}){const [result,setResult]=useState('');const [busy,setBusy]=useState(false);const toast=useToast();async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);try{const data=Object.fromEntries(new FormData(e.currentTarget).entries());const r=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,assignment_id:assignmentId})});const d=await r.json();const msg=r.ok?'Your recommendation is saved.':(d.error||'Submission failed');setResult(msg);toast(msg,r.ok?'success':'error');}catch{setResult('Network error');toast('Network error — please try again.','error')}finally{setBusy(false)}}return <form className="app-form" onSubmit={submit}>{['relevance','rigour','clarity','impact'].map(field=><label key={field}>{field[0].toUpperCase()+field.slice(1)}<select name={field} defaultValue="3">{[1,2,3,4,5].map(n=><option key={n} value={n}>{n} / 5</option>)}</select></label>)}<label>Recommendation<select name="recommendation"><option value="accept">Accept</option><option value="revise">Revise</option><option value="reject">Reject</option></select></label><label>Reviewer comments<textarea name="comments" required rows={5} minLength={15}/></label><button disabled={busy}>{busy?'Saving…':'Save recommendation'}</button>{result&&<div className="message" role="status">{result}</div>}</form>}
+'use client';
+import {FormEvent,useState} from 'react';
+import {useToast} from '@/components/ToastProvider';
+
+type Prior={relevance:number;rigour:number;clarity:number;impact:number;recommendation:string;comments:string};
+export function ReviewForm({assignmentId,initialReview}:{assignmentId:string;initialReview?:Prior}){
+  const [busy,setBusy]=useState(false),[saved,setSaved]=useState(Boolean(initialReview));
+  const [message,setMessage]=useState('');const toast=useToast();
+  async function submit(e:FormEvent<HTMLFormElement>){
+    e.preventDefault();setBusy(true);setMessage('');
+    try{
+      const data=Object.fromEntries(new FormData(e.currentTarget).entries());
+      const response=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,assignment_id:assignmentId})});
+      const payload=await response.json();
+      if(!response.ok)throw new Error(payload.error||'Review could not be saved.');
+      setSaved(true);setMessage('Assessment saved. The organiser can now inspect your recommendation.');toast('Review assessment saved.','success');
+    }catch(e){
+      const msg=e instanceof Error?e.message:'Network error. Try again.';
+      setMessage(msg);toast(msg,'error');
+    }finally{setBusy(false);}
+  }
+  return <form className="app-form" onSubmit={submit}>
+    <h4>Scientific assessment {saved?<span className="pill">Saved — editable</span>:null}</h4>
+    <p className="help">Score each criterion from 1 (poor) to 5 (excellent). Your recommendation is advisory; the organiser makes the decision.</p>
+    {(['relevance','rigour','clarity','impact'] as const).map(field=><label key={field}>
+      {field[0].toUpperCase()+field.slice(1)}
+      <select name={field} defaultValue={initialReview?.[field]??3}>
+        {[1,2,3,4,5].map(n=><option key={n} value={n}>{n} / 5</option>)}
+      </select>
+    </label>)}
+    <label>Recommendation
+      <select name="recommendation" defaultValue={initialReview?.recommendation||'revise'}>
+        <option value="accept">Recommend acceptance</option>
+        <option value="revise">Recommend revision</option>
+        <option value="reject">Recommend rejection</option>
+      </select>
+    </label>
+    <label>Reviewer comments
+      <textarea name="comments" defaultValue={initialReview?.comments||''} required minLength={15} maxLength={4000} rows={5}/>
+    </label>
+    <button disabled={busy}>{busy?'Saving…':saved?'Update assessment':'Submit assessment'}</button>
+    {message&&<div role="status" className="message">{message}</div>}
+  </form>;
+}
