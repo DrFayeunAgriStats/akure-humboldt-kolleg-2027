@@ -1,20 +1,55 @@
+import Link from 'next/link';
 import {Shell} from '@/components/Shell';
+
 export const metadata = {
- title: 'Bid demonstration privacy notice',
- description: 'How test data is used and deleted in the Akure Humboldt Kolleg 2027 working website demonstration.'
+  title: 'Privacy notice',
+  description: 'How Akure Humboldt Kolleg 2027 collects, uses and protects the personal information of participants, authors and reviewers.',
+  alternates: {canonical: '/privacy'}
 };
-export default function Page(){
- return <Shell title="Working demonstration: privacy notice" kicker="TEST DATA · NOT OFFICIAL REGISTRATION">
-  <div className="message warn"><strong>This is a functional bid demonstration, not the official opening of conference registration.</strong> Please use test entries and do not upload unpublished research, confidential papers or sensitive information.</div>
-  <h2>Purpose and responsible team</h2>
-  <p>Able-Flourish Digital Solutions is operating this trial website to demonstrate conference registration, abstract submission, peer review, organiser reporting and publication controls to the organising committee of Akure Humboldt Kolleg 2027. The conference convener is Prof. Jonathan C. Onyekwelu, Department of Forestry and Wood Technology, FUTA. For questions, contact <a href="mailto:jconyekwelu@futa.edu.ng">jconyekwelu@futa.edu.ng</a>.</p>
-  <h2>Information recorded</h2>
-  <p>Signing in requires your email address. Demo registration asks for your name, institutional affiliation, country, participation category and choices about the proposed Kolleg. City and telephone are optional. Demo abstract submission also stores a title, authors, text, keywords, presentation preference and any attachment you choose to upload.</p>
-  <h2>Who can see trial information</h2>
-  <p>Your registration and submitted abstracts are stored in the conference-specific database and are accessible to your authenticated account and authorised organiser users. A reviewer may see only an abstract assigned to them. Attachments are stored privately. If an organiser explicitly accepts and releases an abstract during testing, its public version may become visible on the demo abstract-book page. <strong>Do not test with actual unpublished work.</strong></p>
-  <h2>Trial records and deletion</h2>
-  <p>Trial submissions are marked as demonstration data. They are not official conference registrations or submissions and do not reserve a place or indicate acceptance. The operating team may delete demo registrations, abstracts, files and test accounts before the official conference opens. If you need removal earlier, email the convener. No payment information is collected.</p>
-  <h2>Your choice</h2>
-  <p>Participating in the test is optional. Do not enter any information you would not want the organising team to see while evaluating the platform. You can browse the scientific themes without signing in and try the <a href="/prototype.html">browser-only guided workflow demonstration</a> without sending a registration or abstract to the conference database.</p>
- </Shell>;
+
+// NOTE FOR THE ORGANISING COMMITTEE: this notice should be reviewed and approved by
+// the LOC (and FUTA's data-protection contact) before official registration opens.
+export default function Page() {
+  return <Shell title="Privacy notice" kicker="AKURE HUMBOLDT KOLLEG 2027">
+    <div className="prose">
+      <h2>Who is responsible</h2>
+      <p>This website is operated for the Local Organising Committee of Akure Humboldt Kolleg 2027, hosted by the
+        Federal University of Technology, Akure (FUTA), by Able-Flourish Digital Solutions. The conference convener is
+        Prof. Jonathan C. Onyekwelu, Department of Forestry and Wood Technology, FUTA. Questions about your information:
+        {' '}<a href="mailto:jconyekwelu@futa.edu.ng">jconyekwelu@futa.edu.ng</a>.</p>
+
+      <h2>What we collect</h2>
+      <ul>
+        <li><strong>Sign-in:</strong> your email address, used to send one-time sign-in links.</li>
+        <li><strong>Registration:</strong> name, institution, country, delegate category and your answers about Humboldt status and participation. City and phone number are optional.</li>
+        <li><strong>Abstracts:</strong> title, authors, institution, abstract text, keywords, presentation preference and any attachment you upload.</li>
+        <li><strong>Peer review:</strong> reviewers' scores and comments on the abstracts assigned to them.</li>
+      </ul>
+      <p>No payment information is collected: participation is free.</p>
+
+      <h2>Who can see it</h2>
+      <ul>
+        <li>You can see your own registration and abstracts in your portal.</li>
+        <li>Authorised organisers can see registrations, abstracts and reviews in order to run the Kolleg.</li>
+        <li>Reviewers see only the abstracts assigned to them, without author names, and the attachments for those abstracts.</li>
+        <li>Attachments are stored privately and are opened through short-lived secure links.</li>
+        <li>An abstract is published in the public abstract book only if it is accepted and the committee releases it.</li>
+      </ul>
+
+      <h2>Photographs and video</h2>
+      <p>We use photographs or video of you in conference communications only if you give separate, optional consent when registering.</p>
+
+      <h2>Pre-launch test records</h2>
+      <p>Before official registration opens, the participant system may be tested. Entries made during testing are
+        stored as test records. They are not official registrations or submissions, do not reserve a place and are
+        handled separately from official records. Ask the convener if you want a test record removed.</p>
+
+      <h2>Retention and your choices</h2>
+      <p>Registration and abstract information is kept for as long as needed to organise the Kolleg and its follow-up
+        reporting, then deleted or anonymised as decided by the organising committee. You can ask to see, correct or
+        delete your information by emailing the convener.</p>
+
+      <p><Link href="/">Return to the conference homepage</Link></p>
+    </div>
+  </Shell>;
 }

@@ -3,14 +3,16 @@ import Link from 'next/link';
 import {getSupabaseServer,hasConfig,currentUser,requireRole} from '@/lib/supabase/server';
 import {SignOut} from '../sign-out';
 import {ReviewForm} from './review-form';
+import {abstractReference} from '@/lib/conference-mode-shared';
 
+export const metadata={title:'Reviewer workspace',robots:{index:false,follow:false}};
 export const dynamic='force-dynamic';
 
 type ExistingReview={assignment_id:string;relevance:number;rigour:number;clarity:number;impact:number;recommendation:string;comments:string};
 export default async function Page(){
   if(!hasConfig())return <Shell title="Reviewer workspace"><div className="message warn">Reviewer login is not yet configured.</div></Shell>;
   const me=await currentUser();
-  if(!me)return <Shell title="Reviewer sign-in"><p>Sign in using your authorised reviewer email address.</p><Link className="app-button" href="/login">Sign in</Link></Shell>;
+  if(!me)return <Shell title="Reviewer sign-in"><p>Sign in using your authorised reviewer email address.</p><Link className="app-button" href="/login?next=/dashboard/reviewer">Sign in</Link></Shell>;
   const reviewer=await requireRole('reviewer');
   if(!reviewer)return <Shell title="Restricted reviewer area">
     <div className="message warn">Signed in as <strong>{me.email}</strong>. This account does not have the reviewer role.</div>
@@ -32,10 +34,10 @@ export default async function Page(){
     return {...x,attachment:link?.data?.signedUrl||null};
   }));
   return <Shell title="My assigned abstract reviews" kicker="PEER REVIEW WORKSPACE">
-    <p>Signed in as <strong>{me.email}</strong>. You can assess only abstracts assigned to your account. All records in this evaluation site are demonstration records, not official conference decisions.</p>
+    <p>Signed in as <strong>{me.email}</strong>. You can assess only abstracts assigned to your account. Author identities are withheld for blind review.</p>
     {assignments.error&&<div className="message error">Assignments could not be loaded. Please refresh.</div>}
     {papers.length?papers.map((x:any)=><article className="plain-card" key={x.id}>
-      <div className="eyebrow-small">{x.abstracts?.is_demo?'DEMO-AKH-ABS-':'AKH-ABS-'}{String(x.abstracts?.serial_number).padStart(4,'0')} · Track {x.abstracts?.track}</div>
+      <div className="eyebrow-small">{abstractReference(x.abstracts?.serial_number??0,Boolean(x.abstracts?.is_demo))}{x.abstracts?.is_demo?' · TEST RECORD':''} · Sub-theme {x.abstracts?.track}</div>
       <h3>{x.abstracts?.title}</h3><p>{x.abstracts?.body}</p>
       {x.attachment?<p><a href={x.attachment} className="app-button" target="_blank" rel="noreferrer">Open submitted attachment (temporary secure link) ↗</a></p>:
         <p className="help">{x.abstracts?.file_path?'Attachment unavailable; contact the organiser.':'No attachment supplied. Review the abstract text above.'}</p>}

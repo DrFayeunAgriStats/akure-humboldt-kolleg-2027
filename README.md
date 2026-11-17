@@ -4,15 +4,14 @@ Prepared by **Able-Flourish Digital Solutions**. Next.js 16 App Router source ba
 
 **Important:** The conference is **free / fully sponsored**. There is **no Paystack integration, payment gateway, fee table, payment verification, receipt or payment field**. A participant only needs an account and a free registration reference; abstract submission is optional.
 
-## Current status — functional bid demonstration (November 2026)
+## Current status (November 2026)
 
-This branch opens **working TEST registration and abstract submission**, backed by the dedicated, otherwise empty, Supabase project `vfihhakkeoaskfumgsbw`, not any AFDS production application. The homepage, registration/abstract forms, user portal, programme, abstract book and staff interfaces remain active. The bid demonstration is explicitly **not official conference registration**; all test entries carry an `is_demo` flag and `DEMO-` references and may be deleted before launch. No payment is collected.
+The Local Organising Committee has commissioned this as the official conference website. **Official registration has not yet opened.** The participant system runs in *pre-launch test mode* until the reviewed switch in [`docs/LAUNCH_TRANSITION.md`](docs/LAUNCH_TRANSITION.md) is approved and performed.
 
-A separate browser-only guided demo remains at `/prototype.html` for committee members who want to inspect all roles without submitting data. Role-controlled **real** organiser and reviewer dashboards still require trusted staff accounts; staff privileges are never open to self-serve visitors.
-
-The public Supabase URL and publishable key are included as safe client-facing fallbacks, not secret keys. Confirm the live Supabase Auth URL allowlist, authentication email rate limits, and project deployment before asking outside participants to test. The Vercel connection available in this chat could not read the conference project environment settings.
-
-See `BID_DEMO_RUNBOOK.md` for the demo-to-official-launch transition and cleanup instructions.
+- **Launch controls live in the database** (`public.conference_settings`). Organisers open or close registration and abstract submission, and set deadlines, from **Organiser control centre → Launch controls**. The same row is enforced by row-level security, so the site and the database cannot disagree.
+- **`demo_mode`** decides whether new records are test (`DEMO-` references) or official. Only a database administrator can change it.
+- **Reviewer access** is granted and revoked by organisers in the dashboard. A server route calls audited, organiser-only database functions with the organiser's own session. No service-role key is used, and clients still cannot write `user_roles` directly.
+- **Database tests:** `scripts/test-db.sh` applies every migration to a throwaway local PostgreSQL and runs the security-boundary suite in `supabase/tests/`.
 
 ## Local development
 
@@ -22,12 +21,11 @@ See `BID_DEMO_RUNBOOK.md` for the demo-to-official-launch transition and cleanup
 4. Apply `supabase/migrations/20261113000100_initial_conference_schema.sql` **to the new project only**, review the RLS and private bucket, then verify using test users.
 5. Configure Supabase Auth magic-link URL to `https://YOUR-STAGING-URL/auth/callback`, turn on email verification and bot protection. Assign the organiser role with a privileged one-time database statement referencing the chosen Auth user ID.
 6. Run `npm run typecheck` and `npm run build`, then test locally with `npm run dev` and deploy a preview to Vercel. Use an appropriate commercially licensed hosting plan for a paid AFDS client contract.
-7. Only after privacy consent, organiser content approval, testing, notifications and recovery procedures are in place: set `REGISTRATION_OPEN=true` and `SUBMISSIONS_OPEN=true` for the staging environment; separately approve production rollout.
+7. Open registration and abstract submission from the organiser dashboard's Launch controls only after the checklist in `docs/LAUNCH_TRANSITION.md` has passed.
 
 ## URL structure
 
-- `/` — conference landing page, five subthemes, programme preview, fully sponsored banner, **demo-only forms**.
-- `/prototype.html` — in-browser concept demonstration, not a live system.
+- `/` — conference landing page, five sub-themes, programme preview, participation and venue.
 - `/register` — authenticated **free** registration; no payment fields.
 - `/submit` — registered participants submit a 250–300-word abstract with optional private PDF/DOC/DOCX attachment.
 - `/login`, `/auth/callback` — magic-link authentication.
