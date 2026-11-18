@@ -1,37 +1,36 @@
-# Staging acceptance checklist: PR #6
+# Production acceptance checklist: PR #6
 
-To be completed on **staging only**, and signed off, before any production migration is authorised. Nothing here applies a production migration, deploys to production, or switches the conference to official registration.
+No separate staging environment is used (board decision, 18 November 2026). These checks run against the existing Supabase project and Vercel deployment, **after** the release is authorised. They use AFDS test accounts only, with `demo_mode = true` and official registration closed. The step-by-step procedure, backup verification and rollback are in `docs/PRODUCTION_INTEGRATION.md`.
 
-Record pass/fail, the date, initials, and evidence (screenshot, SQL output or HTTP status) for each item.
+Record pass/fail, the date, initials and evidence (screenshot, SQL output or HTTP status) for each item.
 
 ## A. Authorisations and prerequisites
 
 | # | Item | Evidence |
 |---|---|---|
-| A1 | Project owner authorises the staging rehearsal (this checklist) | written approval |
-| A2 | PR #6 head commit recorded; GitHub Actions green (verify + database jobs) | run URL |
-| A3 | Staging Supabase project is **separate** from production; access limited to the AFDS team | project ref |
-| A4 | Production backup taken and **restore verified** into staging | backup id, restore log |
-| A5 | Restored data contains real testers' emails: staging access restricted; staging data to be deleted after sign-off | owner note |
-| A6 | Staging Auth configured: Site URL and redirect allow-list = staging domain `/auth/callback`; email sending works | screenshot |
-| A7 | Vercel preview for PR #6 points at staging (`NEXT_PUBLIC_SUPABASE_URL`, publishable key; `SITE_PUBLIC=false`) | env screenshot |
+| A1 | Project owner authorises the release (`docs/PRODUCTION_INTEGRATION.md` section 7) | Written approval |
+| A2 | PR #6 head commit recorded; GitHub Actions green (verify + database jobs, including the release rehearsal) | Run URL |
+| A3 | Backup verified: **BACKUP VERIFIED** from `scripts/verify-backup.sh`; attachment count matches (runbook section 2) | Output, file names |
+| A4 | Supabase Auth Site URL and redirect URL set to the production domain (runbook 3.1–3.2) | Screenshot |
+| A5 | Vercel production environment variables set; obsolete flags removed; preview access limited (runbook 4.1–4.3) | Screenshot |
+| A6 | Four test accounts available (organiser, reviewer, participant A, participant B) | Account list (no passwords) |
 
-## B. Database: before migrations (read-only)
+## B. Database: before the release (read-only)
 
 | # | Check | Expected |
 |---|---|---|
-| B1 | Run `supabase/pending/00_live_drift_check.sql` on staging | Matches the 2026-11-18 audit: the two extra `user_roles` policies; broad grants; `demo_mode=true`; global default EXECUTE to `authenticated` |
+| B1 | Run `supabase/pending/00_live_drift_check.sql` on the live project | Matches the 2026-11-18 audit: the two extra `user_roles` policies; broad grants; `demo_mode=true`; global default EXECUTE to `authenticated` |
 | B2 | Run `supabase/pending/01_preflight_report.sql` | Record test and official counts (official = 0) |
 | B3 | `select pg_get_functiondef('public.find_conference_account(text)'::regprocedure)` | Identical to `docs/audit/2026-11-18_live_function_reference.sql` |
 
-## C. Database: apply migrations on staging (each in a transaction)
+## C. Database: release steps and checks
 
 | # | Step | Expected |
 |---|---|---|
-| C1 | Apply `20261117000100` | Succeeds; the two live functions are unchanged (re-run B3) |
-| C2 | Apply `20261117000200` | Succeeds; the **currently live app build** still works against staging (sign-in, register, organiser page) |
-| C3 | Apply `20261118000100` and `20261118000200` together | Succeeds |
-| C4 | Re-run `00_live_drift_check.sql` | No TRUNCATE/REFERENCES/TRIGGER for `anon`/`authenticated` on conference tables; no UPDATE on `conference_settings.demo_mode`; no INSERT/DELETE/UPDATE policies on `user_roles`; abstracts read policy has no reviewer branch; Storage policies and grants unchanged from B1 |
+| C1 | Run `supabase/release/step_a_apply.sql` | Notice **STEP A verified**; the two live functions are unchanged (re-run B3) |
+| C2 | Check the currently deployed app after STEP A (sign-in, register page, organiser page) | Still works |
+| C3 | After the new deployment is Ready, run `supabase/release/step_b_apply.sql` | Notice **STEP B verified** |
+| C4 | Re-run `00_live_drift_check.sql` | No TRUNCATE/REFERENCES/TRIGGER for `anon`/`authenticated` on conference tables; no UPDATE on `conference_settings.demo_mode`; no INSERT/DELETE/UPDATE policies on `user_roles`; abstracts read policy has no reviewer branch; Storage policies and grants unchanged from B1 (Supabase-managed; not modified) |
 | C5 | `select has_column_privilege('authenticated','public.conference_settings','demo_mode','UPDATE')` | `false` |
 | C6 | Functions in `public` executable by **anon** (exact signatures): `select format('%s.%s(%s)', n.nspname, p.proname, oidvectortypes(p.proargtypes)) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and has_function_privilege('anon',p.oid,'EXECUTE') and not exists (select 1 from pg_depend d where d.classid='pg_proc'::regclass and d.objid=p.oid and d.deptype='e') order by 1` | No rows |
 | C7 | Same query for **authenticated** | Exactly these five lines, no more and no fewer:<br>`public.conference_reviewer_assignments()`<br>`public.conference_reviewer_directory()`<br>`public.find_conference_account(text)`<br>`public.grant_conference_reviewer(text)`<br>`public.revoke_conference_reviewer(uuid)`<br>Any other signature, **including an overload of one of these names** (e.g. `find_conference_account(text, integer)`), is a failure. |
@@ -40,14 +39,14 @@ Record pass/fail, the date, initials, and evidence (screenshot, SQL output or HT
 | C8 | Row counts from B2 unchanged | Identical |
 | C9 | `select demo_mode, registration_open, submissions_open from public.conference_settings` | Unchanged from B1 (still test mode) |
 
-## D. Application: deploy PR #6 build to staging preview
+## D. Application: production deployment of PR #6
 
 | # | Check | Expected |
 |---|---|---|
-| D1 | Preview loads; no console errors on `/`, `/register`, `/submit`, `/programme`, `/login`, `/dashboard` | Pass |
-| D2 | Launch controls (organiser) show the staging values from C9 | Match |
+| D1 | Production site loads; no console errors on `/`, `/register`, `/submit`, `/programme`, `/login`, `/dashboard` | Pass |
+| D2 | Launch controls (organiser) show the values from C9, including `demo_mode` (test mode) | Match |
 
-## E. Functional acceptance by role (staging accounts)
+## E. Functional acceptance by role (test accounts)
 
 **Participant**
 
@@ -81,7 +80,7 @@ Record pass/fail, the date, initials, and evidence (screenshot, SQL output or HT
 | E16 | Save, then edit, a review | Both succeed |
 | E17 | Organiser removes reviewer access; reviewer reloads | "Restricted reviewer area"; attachment link refused |
 
-## F. Security probes against staging (REST, using the staging publishable key)
+## F. Security probes against production (REST, using the publishable key and test-account tokens)
 
 Expected results are shown; any successful data access is a failure.
 
@@ -95,7 +94,7 @@ Expected results are shown; any successful data access is a failure.
 | F6 | As an organiser token: `POST /rest/v1/user_roles` body `{"user_id":"…","role":"reviewer"}` | Permission denied |
 | F7 | As an organiser token: `PATCH /rest/v1/abstracts?id=eq.…` body `{"is_demo":false}` | Permission denied |
 | F8 | Cross-site `POST /api/register` with `Origin: https://example.org` | 403 |
-| F9 | Supabase Security Advisor on staging | No new warnings for public SECURITY DEFINER functions or exposed tables; review any remaining ones |
+| F9 | Supabase Security Advisor (compare with the export from pre-flight) | No new warnings for public SECURITY DEFINER functions or exposed tables; review any remaining ones |
 
 ## G. Mobile, accessibility and content
 
@@ -106,12 +105,13 @@ Expected results are shown; any successful data access is a failure.
 | G3 | axe scan of the D1 pages | 0 violations |
 | G4 | LOC confirms public wording ("proposed" removed) and approves `/privacy` | Written confirmation |
 
-## H. Rollback rehearsal (staging)
+## H. Rollback readiness
 
 | # | Check | Expected |
 |---|---|---|
-| H1 | Restore the B-stage backup into a second staging project | Restores cleanly; the old app works against it |
-| H2 | Agree the production rollback rule | Restore from backup or forward-fix. Never re-grant the removed privileges |
+| H1 | CI release rehearsal passed for the released commit (STEP A/B, rollback, roll forward, backup verification) | Run URL |
+| H2 | Previous Vercel production deployment ID recorded; Instant Rollback available | Deployment ID |
+| H3 | `supabase/release/step_b_rollback_app_compat.sql` at hand; rule agreed: roll back with Vercel and this script, or restore from backup. Never re-grant the removed privileges | Owner note |
 
 ## I. Sign-off
 
@@ -119,6 +119,6 @@ Expected results are shown; any successful data access is a failure.
 |---|---|---|---|
 | AFDS technical lead | | | |
 | AFDS Advisory Board | | | |
-| Project owner | | Authorise production steps 3–4 of the migration order | |
+| Project owner | | Accept the release | |
 
 Opening official registration (Option A, `supabase/pending/02_option_a_retain_and_segregate.sql`) is a **separate** authorisation after production acceptance.

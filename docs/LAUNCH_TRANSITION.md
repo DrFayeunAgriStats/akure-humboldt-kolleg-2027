@@ -26,41 +26,25 @@ Everything is controlled by one database row, `public.conference_settings` (id =
 
 ## Deploying this release (before any launch decision)
 
-Complete and sign off `docs/STAGING_ACCEPTANCE.md` on staging before any production step.
+No separate staging environment is used (board decision, 18 November 2026). Follow **`docs/PRODUCTION_INTEGRATION.md`**:
+- pre-flight drift check;
+- verified backup;
+- Supabase and Vercel configuration;
+- the guarded release files `supabase/release/step_a_apply.sql` and `step_b_apply.sql`;
+- rollback with `step_b_rollback_app_compat.sql`.
 
-The live audit of 2026-11-18 (`docs/audit/`) is reproduced in CI by `supabase/tests/fixtures/live_drift_2026-11-18.sql`. Every suite runs against both a fresh database and that live-like clone.
-
-| Order | Migration | Compatible with app currently live? | Compatible with this PR's app? |
-|---|---|---|---|
-| 1 | `20261117000100` reconcile live functions (no-op on live) | Yes | Yes |
-| 2 | `20261117000200` grant/revoke functions, deadline gates, audit columns | Yes | Required |
-| 3 | `20261118000100` blind review and revocation | **No**: old reviewer page loses abstract text | Required |
-| 4 | `20261118000200` least-privilege grants, drop direct role-write policies | **No**: old organiser panel's reviewer grant stops working | Required |
-
-1. **Re-run the read-only drift check** (`supabase/pending/00_live_drift_check.sql`) and confirm that the live state still matches the audit. In particular, compare the exact text of the two `user_roles` write policies. The fixture reconstructs them from the audit description.
-2. **Backup** (and verify that it restores).
-3. **Staging:** restore the backup to staging, apply 1 → 4, deploy this PR's build to staging, and run the smoke test below.
-4. **Production, step A (any time):** apply 1 and 2, each in a transaction. The live app keeps working.
-5. **Production, step B (short maintenance window, minutes):** apply 3 and 4 in one transaction, then immediately promote the already-built deployment of this PR. Between the two, reviewer pages and reviewer grants are briefly unavailable; registration and submission are unaffected.
-6. **Smoke test:**
-   - Launch controls show `demo_mode=true` and the live open/closed values.
-   - A reviewer sees assignments without author names.
-   - Granting and removing a reviewer works.
-   - A participant gets 403 from the organiser APIs.
-   - The drift check shows no TRUNCATE/DELETE grants to `anon`/`authenticated` and no UPDATE on `demo_mode`.
-
-Use the SQL editor rather than `supabase db push` unless the live migration history already lists every earlier file.
+Then complete **`docs/PRODUCTION_ACCEPTANCE.md`**. The release keeps `demo_mode = true`, so it does not open official registration.
 
 ## Procedure for the official switch
 
 1. **Backup.** Take a Supabase backup (or `pg_dump`) and confirm that it restores.
 2. **Read-only report.** Run `supabase/pending/01_preflight_report.sql` and attach the output to the approval record.
-3. **Staging rehearsal.** Restore the backup to a staging project, run the chosen option there, and complete the checklist below.
+3. **Rehearsal.** Option A is rehearsed automatically in CI on fresh and live-like databases (`supabase/tests/20_option_a_transition.sql`). Before running it on production, verify a fresh backup as in `docs/PRODUCTION_INTEGRATION.md` section 2.
 4. **Production switch.** Run the chosen option in the SQL editor. Both gates are left **closed**.
 5. **Post-switch smoke test** while closed: confirm `/register` says "Registration is not open yet".
 6. **Open.** An organiser opens registration and, when announced, abstract submission from Launch controls.
 
-## End-to-end checklist (staging, then production)
+## End-to-end checklist (production, with test accounts)
 
 - [ ] Sign in by email link; an expired or reused link shows a clear message.
 - [ ] Register; the confirmation email arrives with an `AKH-2027-` reference (no `DEMO-`).

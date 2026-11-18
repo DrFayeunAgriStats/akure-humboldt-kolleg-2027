@@ -5,26 +5,9 @@
 \i supabase/tests/_helpers.sql
 
 -- Expected table-level privileges for client roles. Anything not listed must be absent.
-create temp table expected(role text, tbl text, priv text);
-insert into expected values
-  ('anon','speakers','SELECT'), ('anon','sessions','SELECT'), ('anon','public_abstracts','SELECT'), ('anon','conference_settings','SELECT'),
-  ('authenticated','user_roles','SELECT'),
-  ('authenticated','registrations','SELECT'), ('authenticated','registrations','INSERT'),
-  ('authenticated','abstracts','SELECT'), ('authenticated','abstracts','INSERT'),
-  ('authenticated','review_assignments','SELECT'), ('authenticated','review_assignments','INSERT'), ('authenticated','review_assignments','DELETE'),
-  ('authenticated','reviews','SELECT'), ('authenticated','reviews','INSERT'),
-  ('authenticated','speakers','SELECT'), ('authenticated','speakers','INSERT'), ('authenticated','speakers','UPDATE'), ('authenticated','speakers','DELETE'),
-  ('authenticated','sessions','SELECT'), ('authenticated','sessions','INSERT'), ('authenticated','sessions','UPDATE'), ('authenticated','sessions','DELETE'),
-  ('authenticated','public_abstracts','SELECT'),
-  ('authenticated','conference_settings','SELECT');
-
-create temp table actual as
-  select r.role, t.tbl, p.priv
-  from (values ('anon'), ('authenticated')) r(role)
-  cross join (values ('user_roles'),('registrations'),('abstracts'),('review_assignments'),('reviews'),
-                     ('speakers'),('sessions'),('public_abstracts'),('conference_settings')) t(tbl)
-  cross join (values ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(priv)
-  where has_table_privilege(r.role, 'public.' || t.tbl, p.priv);
+-- Expected and actual table-level privileges come from _helpers.sql (single source of truth).
+create temp table expected as select * from t.expected_table_privileges();
+create temp table actual as select * from t.actual_table_privileges();
 
 select t.ok(not exists (select * from actual except select * from expected),
   'matrix: no client role holds a table privilege beyond the intended set'

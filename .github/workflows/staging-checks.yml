@@ -49,5 +49,14 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-      - name: Migrations, privilege matrix, security boundaries and Option A (fresh + live-clone)
+      - name: PostgreSQL 17 client tools (pg_dump/pg_restore must match the server)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+      - name: Database suites (fresh + live-clone) and release rehearsal (backup, STEP A/B, rollback)
+        env:
+          PG_DUMP: /usr/lib/postgresql/17/bin/pg_dump
+          PG_RESTORE: /usr/lib/postgresql/17/bin/pg_restore
         run: scripts/test-db.sh

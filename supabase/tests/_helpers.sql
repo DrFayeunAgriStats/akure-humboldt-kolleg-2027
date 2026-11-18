@@ -81,3 +81,36 @@ create function t.guard_authenticated_violations() returns setof text language s
   order by 1
 $$;
 grant execute on all functions in schema t to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Intended table-level privileges for the client roles on the nine conference
+-- tables (single source of truth for 15_ and 30_ suites). Column-level grants
+-- are asserted separately.
+-- ---------------------------------------------------------------------------
+create function t.expected_table_privileges() returns table(role text, tbl text, priv text) language sql immutable as $$
+  values
+  ('anon','speakers','SELECT'), ('anon','sessions','SELECT'), ('anon','public_abstracts','SELECT'), ('anon','conference_settings','SELECT'),
+  ('authenticated','user_roles','SELECT'),
+  ('authenticated','registrations','SELECT'), ('authenticated','registrations','INSERT'),
+  ('authenticated','abstracts','SELECT'), ('authenticated','abstracts','INSERT'),
+  ('authenticated','review_assignments','SELECT'), ('authenticated','review_assignments','INSERT'), ('authenticated','review_assignments','DELETE'),
+  ('authenticated','reviews','SELECT'), ('authenticated','reviews','INSERT'),
+  ('authenticated','speakers','SELECT'), ('authenticated','speakers','INSERT'), ('authenticated','speakers','UPDATE'), ('authenticated','speakers','DELETE'),
+  ('authenticated','sessions','SELECT'), ('authenticated','sessions','INSERT'), ('authenticated','sessions','UPDATE'), ('authenticated','sessions','DELETE'),
+  ('authenticated','public_abstracts','SELECT'),
+  ('authenticated','conference_settings','SELECT')
+$$;
+create function t.actual_table_privileges() returns table(role text, tbl text, priv text) language sql stable as $$
+  select r.role, tb.tbl, p.priv
+  from (values ('anon'), ('authenticated')) r(role)
+  cross join (values ('user_roles'),('registrations'),('abstracts'),('review_assignments'),('reviews'),
+                     ('speakers'),('sessions'),('public_abstracts'),('conference_settings')) tb(tbl)
+  cross join (values ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(priv)
+  where has_table_privilege(r.role, 'public.' || tb.tbl, p.priv)
+$$;
+create function t.table_privilege_diff() returns setof text language sql stable as $$
+  select 'extra: ' || role || ' ' || priv || ' ' || tbl from (select * from t.actual_table_privileges() except select * from t.expected_table_privileges()) x
+  union all
+  select 'missing: ' || role || ' ' || priv || ' ' || tbl from (select * from t.expected_table_privileges() except select * from t.actual_table_privileges()) y
+$$;
+grant execute on all functions in schema t to anon, authenticated;

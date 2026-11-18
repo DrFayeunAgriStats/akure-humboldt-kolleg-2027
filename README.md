@@ -20,7 +20,7 @@ The Local Organising Committee has commissioned this as the official conference 
 2. Create a **new dedicated Supabase project** specifically for this conference, rather than reusing a live VivaSense, Veterans Bookstock or cooperative database.
 3. Copy `.env.example` to `.env.local` and supply the new project's public URL and publishable key. Never commit `.env.local` or a Supabase secret key.
 4. Apply `supabase/migrations/20261113000100_initial_conference_schema.sql` **to the new project only**, review the RLS and private bucket, then verify using test users.
-5. Configure Supabase Auth magic-link URL to `https://YOUR-STAGING-URL/auth/callback`, turn on email verification and bot protection. Assign the organiser role with a privileged one-time database statement referencing the chosen Auth user ID.
+5. Configure the Supabase Auth magic-link redirect URL to `https://<production-domain>/auth/callback`, turn on email verification and bot protection. Assign the organiser role with a privileged one-time database statement referencing the chosen Auth user ID.
 6. Run `npm run typecheck` and `npm run build`, then test locally with `npm run dev` and deploy a preview to Vercel. Use an appropriate commercially licensed hosting plan for a paid AFDS client contract.
 7. Open registration and abstract submission from the organiser dashboard's Launch controls only after the checklist in `docs/LAUNCH_TRANSITION.md` has passed.
 
@@ -51,4 +51,4 @@ The Local Organising Committee has commissioned this as the official conference 
 
 The Kolleg is still **proposed**; confirm host permissions, institutional logos, speakers, dates and location with the organising committee before replacing placeholders. Do not use fictional names or displayed sample statistics as factual reporting. The website is a working bid demonstration and test records are separately flagged. No test records should be treated as official conference applications.
 
-See `DEPLOYMENT_HANDOVER.md` for the fastest staging sequence.
+See `docs/PRODUCTION_INTEGRATION.md` for the release procedure (backup verification, guarded release SQL, rollback).
