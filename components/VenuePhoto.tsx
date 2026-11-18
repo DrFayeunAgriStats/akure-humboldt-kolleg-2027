@@ -1,7 +1,7 @@
 'use client';
 import {useEffect, useRef, useState} from 'react';
 
-/** Licensed remote venue photograph; if it cannot be loaded, a neutral captioned panel is shown instead of a broken image. */
+/** Original supplied campus gate photograph; if the locally hosted image cannot load, show a neutral placeholder. */
 export function VenuePhoto({src, alt}: {src: string; alt: string}) {
   const [failed, setFailed] = useState(false);
   const ref = useRef<HTMLImageElement>(null);
