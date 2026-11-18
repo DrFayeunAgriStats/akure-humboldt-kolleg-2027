@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept B — Horizon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--night:#0f1b2d;--saffron:#f2b630;--saffron-d:#d99a12;--sand:#f6efe2;--clay:#9c3d1b;--ink:#0f1b2d;--muted:#4a5568;--teal:#0f6e6a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sand);color:var(--ink);font:400 18px/1.55 "Source Sans 3",system-ui,sans-serif}
+a{color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+.display{font-family:"Big Shoulders Display",sans-serif;text-transform:uppercase;letter-spacing:.005em}
+/* top bar */
+.top{background:var(--night);color:#fff}
+.top .wrap{display:flex;align-items:center;gap:24px;height:64px}
+.brand{font:800 22px/1 "Big Shoulders Display";letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+.brand b{color:var(--saffron)}
+.top nav{margin-left:auto;display:flex;gap:24px;font-weight:600;font-size:16px}
+.top nav a{text-decoration:none;opacity:.9}
+.portal{background:var(--saffron);color:var(--night);font-weight:700;padding:10px 16px;border-radius:4px;text-decoration:none;font-size:15px}
+.menu{display:none;margin-left:auto;background:none;border:2px solid #fff;color:#fff;border-radius:4px;height:42px;padding:0 12px;font:700 14px "Source Sans 3"}
+/* hero */
+.hero{background:var(--saffron);position:relative;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;padding-top:56px;padding-bottom:56px;align-items:center}
+.date{font:900 clamp(84px,13vw,190px)/.82 "Big Shoulders Display";letter-spacing:-.01em;margin:0}
+.date small{display:block;font-size:.34em;letter-spacing:.06em;margin-top:12px}
+.title{font:800 clamp(30px,3.6vw,46px)/1.02 "Big Shoulders Display";text-transform:uppercase;margin:26px 0 10px;max-width:18ch}
+.where{font-weight:700;font-size:19px;margin:0 0 26px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 26px;border-radius:4px;font:700 17px "Source Sans 3";text-decoration:none}
+.btn-dark{background:var(--night);color:#fff}
+.btn-line{border:2.5px solid var(--night)}
+.side{background:var(--night);color:#fff;border-radius:6px;padding:28px}
+.side .lab{font:800 15px "Big Shoulders Display";letter-spacing:.12em;text-transform:uppercase;color:var(--saffron)}
+.side ul{list-style:none;padding:0;margin:14px 0 0}
+.side li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,.16);font-size:16px}
+.side li b{font-weight:700}
+/* photo band */
+.photo{position:relative;height:420px;background:#2a3b2f url(../../public/assets/nigerian-rainforest-interior.webp) center/cover}
+.photo figcaption{position:absolute;left:28px;bottom:20px;background:rgba(15,27,45,.85);color:#fff;font-size:14px;padding:8px 12px;border-radius:4px;max-width:calc(100% - 56px)}
+.photo .q{position:absolute;right:28px;top:28px;max-width:420px;background:var(--sand);padding:22px 24px;border-radius:4px;font:800 30px/1.05 "Big Shoulders Display";text-transform:uppercase}
+/* themes */
+section{padding:64px 0}
+h2{font:900 clamp(40px,5vw,64px)/.95 "Big Shoulders Display";text-transform:uppercase;margin:0 0 28px}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:3px solid var(--night)}
+.tile{padding:22px 18px 26px;border-right:1px solid #d9cdb7;min-height:220px}
+.tile:last-child{border-right:0}
+.tile .no{font:900 54px/1 "Big Shoulders Display";color:var(--clay)}
+.tile h3{font:700 18px/1.3 "Source Sans 3";margin:12px 0 0}
+.go{display:inline-block;margin-top:24px;font-weight:700;border-bottom:3px solid var(--saffron)}
+/* participation */
+.join{background:var(--night);color:#fff}
+.join .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.step{border:1.5px solid rgba(255,255,255,.22);border-radius:6px;padding:26px}
+.step .k{font:900 64px/1 "Big Shoulders Display";color:var(--saffron)}
+.step h3{font:800 28px/1 "Big Shoulders Display";text-transform:uppercase;margin:10px 0 8px}
+.step p{color:#cdd5e2;margin:0 0 18px;font-size:16px}
+.step a{font-weight:700;color:var(--saffron)}
+.partners{display:flex;gap:44px;flex-wrap:wrap;align-items:center;font-size:15px;color:var(--muted)}
+.partners b{display:block;color:var(--ink);font-size:17px}
+.pbox{width:56px;height:56px;border:2px dashed #b8a98d;border-radius:4px;display:inline-grid;place-items:center;font:800 13px "Big Shoulders Display";margin-right:12px;vertical-align:middle;color:#7a6a4d}
+footer{border-top:3px solid var(--night);padding:28px 0;font-size:15px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.note{position:fixed;right:12px;bottom:12px;background:#111;color:#fff;font:600 12px "Source Sans 3";padding:6px 10px;border-radius:6px;opacity:.75}
+@media (max-width:980px){.tiles{grid-template-columns:repeat(2,1fr)}.tile{border-bottom:1px solid #d9cdb7}.join .wrap{grid-template-columns:1fr}}
+@media (max-width:760px){
+ .top nav,.portal{display:none}.menu{display:inline-block}
+ .hero .wrap{grid-template-columns:1fr;padding-top:32px;padding-bottom:32px;gap:24px}
+ .title{margin-top:18px}.ctas .btn{flex:1 1 100%}
+ .photo{height:300px}.photo .q{left:16px;right:16px;top:16px;font-size:22px;padding:14px 16px}
+ .photo figcaption{left:16px;bottom:12px;max-width:calc(100% - 32px);font-size:13px}
+ section{padding:44px 0}
+ .tiles{grid-template-columns:1fr}.tile{min-height:0;border-right:0;display:flex;gap:16px;align-items:baseline;padding:16px 4px}
+ .tile .no{font-size:40px;min-width:44px}.tile h3{margin:0;font-size:17px}
+ .wrap{padding:0 18px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#">Akure Humboldt Kolleg <b>2027</b></a>
+  <nav aria-label="Main"><a href="#">Programme</a><a href="#">Abstracts</a><a href="#">Speakers</a><a href="#">Venue</a></nav>
+  <a class="portal" href="#">My portal</a>
+  <button class="menu">Menu</button>
+</div></header>
+
+<section class="hero" style="padding:0">
+  <div class="wrap">
+    <div>
+      <p class="date">22–25 Feb<small>2027 · Akure, Nigeria</small></p>
+      <p class="title">Biodiversity, climate change and food security</p>
+      <p class="where">Federal University of Technology, Akure · Free to attend</p>
+      <div class="ctas"><a class="btn btn-dark" href="#">Register now</a><a class="btn btn-line" href="#">Submit an abstract</a></div>
+    </div>
+    <aside class="side" aria-label="At a glance">
+      <span class="lab">Participation</span>
+      <ul>
+        <li><span>Fee</span><b>Free · fully sponsored</b></li>
+        <li><span>Abstracts</span><b>250–300 words</b></li>
+        <li><span>Format</span><b>Oral or poster</b></li>
+        <li><span>Registration</span><b>Opens soon</b></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<figure class="photo" style="margin:0">
+  <p class="q">The role of science, innovation and community engagement</p>
+  <figcaption>Stand-in image (project concept artwork). Final: licensed FUTA / Akure photography with credit.</figcaption>
+</figure>
+
+<section><div class="wrap">
+  <h2>Five sub-themes</h2>
+  <div class="tiles">
+    <article class="tile"><div class="no">01</div><h3>Climate change, natural resources, biodiversity conservation and food security</h3></article>
+    <article class="tile"><div class="no">02</div><h3>Youth-led innovation for climate-smart agroecology and advocacy</h3></article>
+    <article class="tile"><div class="no">03</div><h3>Indigenous and nature-based solutions for the nexus</h3></article>
+    <article class="tile"><div class="no">04</div><h3>One Health, human health and food security under climate change</h3></article>
+    <article class="tile"><div class="no">05</div><h3>Emerging technologies for the biodiversity–climate–food nexus</h3></article>
+  </div>
+  <a class="go" href="#">Read the call for abstracts</a>
+</div></section>
+
+<section class="join"><div class="wrap">
+  <div class="step"><div class="k">1</div><h3>Register</h3><p>Free, two minutes, with a one-time email link.</p><a href="#">Register →</a></div>
+  <div class="step"><div class="k">2</div><h3>Submit</h3><p>One abstract per sub-theme, oral or poster.</p><a href="#">Submit →</a></div>
+  <div class="step"><div class="k">3</div><h3>Track</h3><p>Follow peer review in your private portal.</p><a href="#">My portal →</a></div>
+</div></section>
+
+<section><div class="wrap partners">
+  <span><span class="pbox">FUTA</span>Hosted by <b style="display:inline">Federal University of Technology, Akure</b></span>
+  <span><span class="pbox">AvH</span>Sponsored by <b style="display:inline">Alexander von Humboldt Foundation</b></span>
+</div></section>
+<footer><div class="wrap"><span>Akure Humboldt Kolleg 2027 · FUTA, Akure, Nigeria</span><span>Contact · Privacy</span></div></footer>
+<div class="note">Concept B · Horizon</div>
+</body>
+</html>
