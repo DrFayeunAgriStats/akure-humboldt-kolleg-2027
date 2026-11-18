@@ -28,6 +28,13 @@ update public.conference_settings
 
 -- Sanity checks: abort the whole transaction if anything is unexpected.
 do $$ begin
+  -- no remaining unique constraint or index on registrations(user_id) alone
+  -- (e.g. one created on the live project under a different name)
+  if exists (
+    select 1 from pg_index i
+    where i.indrelid = 'public.registrations'::regclass and i.indisunique
+      and i.indkey::text = (select attnum::text from pg_attribute where attrelid = 'public.registrations'::regclass and attname = 'user_id')
+  ) then raise exception 'registrations still has a unique index on user_id alone; review before launch'; end if;
   if (select demo_mode from public.conference_settings where id = 1) then raise exception 'demo_mode still on'; end if;
   if exists (select 1 from public.public_abstracts p join public.abstracts a on a.id = p.id where a.is_demo) then
     raise exception 'a test abstract is in the public abstract book';
@@ -35,6 +42,7 @@ do $$ begin
 end $$;
 
 commit;
--- Rollback plan (before any official record exists):
+-- Rollback plan: only BEFORE any official record exists:
 --   update public.conference_settings set demo_mode = true where id = 1;
--- (the index/constraint changes are harmless to keep).
+-- (the index/constraint changes are harmless to keep). Once official records
+-- exist, do not switch back; close the gates in Launch controls instead.

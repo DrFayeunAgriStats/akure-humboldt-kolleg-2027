@@ -1,15 +1,24 @@
 #!/usr/bin/env bash
-# Applies every migration to a throwaway local PostgreSQL database (with Supabase
-# stand-ins) and runs the security-boundary tests. Never touches a Supabase project.
+# Applies every migration to throwaway local PostgreSQL databases (with Supabase
+# stand-ins) and runs the database test suites. Never touches a Supabase project.
 # Usage: scripts/test-db.sh   (needs psql/createdb; PG* env vars select the server)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-DB="akh_test_$$"
-createdb "$DB"
-trap 'dropdb --if-exists "$DB"' EXIT
-run() { psql -X -q -t -v ON_ERROR_STOP=1 -d "$DB" -f "$1"; }
-run supabase/tests/00_local_supabase_stub.sql
-for f in supabase/migrations/*.sql; do echo "migrate  $f"; run "$f"; done
-echo "-- re-applying the new migrations to prove they are idempotent"
-for f in supabase/migrations/202611170*.sql; do run "$f"; done
-run supabase/tests/10_security_boundaries.sql 2>&1 | sed 's/^psql:[^ ]* NOTICE:  /  /'
+SUITES=(supabase/tests/10_security_boundaries.sql supabase/tests/20_option_a_transition.sql)
+DBS=()
+trap 'for d in "${DBS[@]}"; do dropdb --if-exists "$d"; done' EXIT
+export PGOPTIONS="-c client_min_messages=warning"   # hide routine NOTICEs, keep errors
+run() { psql -X -q -t -v ON_ERROR_STOP=1 -d "$1" -f "$2"; }
+
+for suite in "${SUITES[@]}"; do
+  DB="akh_test_$$_${#DBS[@]}"; DBS+=("$DB")
+  createdb "$DB"
+  run "$DB" supabase/tests/00_local_supabase_stub.sql
+  for f in supabase/migrations/*.sql; do run "$DB" "$f"; done
+  if [ "${#DBS[@]}" -eq 1 ]; then
+    echo "-- all migrations applied; re-applying the 2026-11-17/18 migrations to prove they are idempotent"
+    for f in supabase/migrations/2026111[78]*.sql; do run "$DB" "$f"; done
+  fi
+  echo "== $suite"
+  run "$DB" "$suite" 2>&1 | sed -n 's/^.*NOTICE:  \(PASS.*\)$/  \1/p; s/^\(.*TESTS PASSED\)$/\1/p; /FAIL\|ERROR/p'
+done

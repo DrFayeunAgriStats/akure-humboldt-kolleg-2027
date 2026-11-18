@@ -13,11 +13,13 @@ export default async function Page(){
   if(!user)return <Shell title="Access restricted"><p>This workspace requires organiser access assigned by the organising committee.</p><Link href="/dashboard">Return to my portal</Link></Shell>;
   const db=await getSupabaseServer();
   const settings=await getConferenceSettings();
-  const [regs,abs,regCount,absCount,assignments,reviews,directory]=await Promise.all([
+  const [regs,abs,regCount,absCount,regTest,absTest,assignments,reviews,directory]=await Promise.all([
     db.from('registrations').select('id,serial_number,full_name,institution,email,category,created_at,is_demo').order('created_at',{ascending:false}).limit(100),
     db.from('abstracts').select('id,serial_number,title,track,status,author_name,institution,created_at,is_published,is_demo').order('created_at',{ascending:false}).limit(100),
     db.from('registrations').select('id',{head:true,count:'exact'}),
     db.from('abstracts').select('id',{head:true,count:'exact'}),
+    db.from('registrations').select('id',{head:true,count:'exact'}).eq('is_demo',true),
+    db.from('abstracts').select('id',{head:true,count:'exact'}).eq('is_demo',true),
     db.from('review_assignments').select('id,abstract_id,reviewer_id').limit(1000),
     db.from('reviews').select('assignment_id,reviewer_id,relevance,rigour,clarity,impact,recommendation,comments,updated_at').limit(1000),
     db.rpc('conference_reviewer_directory')
@@ -41,8 +43,8 @@ export default async function Page(){
     {settings.demo_mode&&<div className="message warn"><strong>Pre-launch test mode:</strong> registrations, reviews and decisions recorded now are test records. Do not issue formal invitations or acceptance letters based on them.</div>}
     {settings.available?<LaunchControls initial={settings}/>:<div className="message error">Launch settings could not be loaded. Refresh the page.</div>}
     <div className="app-grid">
-      <div className="plain-card"><span className="eyebrow-small">REGISTRATIONS</span><h2>{regCount.count??0}</h2></div>
-      <div className="plain-card"><span className="eyebrow-small">ABSTRACTS</span><h2>{absCount.count??0}</h2></div>
+      <div className="plain-card"><span className="eyebrow-small">OFFICIAL REGISTRATIONS</span><h2>{(regCount.count??0)-(regTest.count??0)}</h2><p className="help">{regTest.count??0} test records kept separately</p></div>
+      <div className="plain-card"><span className="eyebrow-small">OFFICIAL ABSTRACTS</span><h2>{(absCount.count??0)-(absTest.count??0)}</h2><p className="help">{absTest.count??0} test records kept separately</p></div>
       <div className="plain-card"><span className="eyebrow-small">AWAITING DECISION</span>
         <h2>{(abs.data||[]).filter(x=>x.status==='submitted'||x.status==='under_review').length}</h2>
         <p className="help">Among latest 100 abstracts</p></div>

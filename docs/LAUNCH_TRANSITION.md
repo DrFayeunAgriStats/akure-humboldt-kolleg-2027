@@ -24,7 +24,16 @@ Everything is controlled by one database row, `public.conference_settings` (id =
 4. **Privacy notice.** The LOC, and FUTA's data-protection contact, approve `/privacy`, including the retention period.
 5. **Deadlines** for registration and abstracts.
 
-## Procedure
+## Deploying this release (before any launch decision)
+
+1. **Drift check (read-only).** Run `supabase/pending/00_live_drift_check.sql` on the live project and review the output against the repository. Look for extra permissive policies, function grants to `anon`/`PUBLIC`, and constraint names.
+2. **Reconcile.** Replace the reconstructed bodies in `20261117000100` with the exact live definitions. Thanks to its if-absent guard, the migration stays a no-op on live.
+3. **Backup**, then apply, in order and each in a transaction, on a staging copy first and then on live:
+   `20261117000100` → `20261117000200` → `20261118000100`. Use `supabase db push` only if the live migration history already lists the earlier files; otherwise use the SQL editor.
+4. **Then** deploy the application. The new reviewer workspace calls `conference_reviewer_assignments()`, and reviewer grants call `grant_conference_reviewer()`. Deploying the app before the migrations would break both.
+5. Post-deploy smoke test: Launch controls show the live values; a reviewer sees their assignments; a participant gets 403 from organiser APIs.
+
+## Procedure for the official switch
 
 1. **Backup.** Take a Supabase backup (or `pg_dump`) and confirm that it restores.
 2. **Read-only report.** Run `supabase/pending/01_preflight_report.sql` and attach the output to the approval record.
@@ -46,4 +55,4 @@ Everything is controlled by one database row, `public.conference_settings` (id =
 - [ ] Participants get 403 from every organiser API and cannot change launch settings.
 - [ ] CSV exports open correctly and include the `is_demo` column.
 
-The automated equivalents run locally with `scripts/test-db.sh` (database security boundaries). An app-level rehearsal of Option A was also performed, as described in the pull request.
+The automated equivalents run with `scripts/test-db.sh`, locally and in CI: the database security boundaries plus a full Option A transition test (`supabase/tests/20_option_a_transition.sql`).

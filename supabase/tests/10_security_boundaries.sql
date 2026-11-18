@@ -2,44 +2,9 @@
 -- Run after 00_local_supabase_stub.sql and every file in supabase/migrations
 -- (scripts/test-db.sh does this on a throwaway database). Any failure aborts.
 \set ON_ERROR_STOP on
-set client_min_messages = notice;
 
-create schema t;
-grant usage on schema t to anon, authenticated;
--- Runs as the CURRENT role, so RLS and privileges apply to the tested SQL.
-create function t.expect_error(p_sql text, p_label text, p_state text default null)
-returns void language plpgsql as $$
-declare v_state text;
-begin
-  begin
-    execute p_sql;
-  exception when others then
-    get stacked diagnostics v_state = returned_sqlstate;
-    if p_state is not null and v_state <> p_state then
-      raise exception 'FAIL % — expected SQLSTATE %, got % (%)', p_label, p_state, v_state, sqlerrm;
-    end if;
-    raise notice 'PASS %', p_label;
-    return;
-  end;
-  raise exception 'FAIL % — statement succeeded but should have been rejected', p_label;
-end$$;
-create function t.expect_rows(p_sql text, p_expected bigint, p_label text)
-returns void language plpgsql as $$
-declare v bigint;
-begin
-  execute 'with q as (' || p_sql || ') select count(*) from q' into v;
-  if v <> p_expected then raise exception 'FAIL % — expected % rows, got %', p_label, p_expected, v; end if;
-  raise notice 'PASS %', p_label;
-end$$;
-create function t.ok(p_cond boolean, p_label text) returns void language plpgsql as $$
-begin
-  if not coalesce(p_cond, false) then raise exception 'FAIL %', p_label; end if;
-  raise notice 'PASS %', p_label;
-end$$;
-create function t.as_user(p_id uuid, p_email text) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', p_id, 'email', p_email)::text, false);
-$$;
-grant execute on all functions in schema t to anon, authenticated;
+
+\i supabase/tests/_helpers.sql
 
 -- Fixtures (as superuser) ----------------------------------------------------
 insert into auth.users(id, email) values
@@ -155,13 +120,21 @@ select t.expect_error($$update public.conference_settings set demo_mode = false$
 insert into public.review_assignments(abstract_id, reviewer_id) select id, '00000000-0000-0000-0000-00000000000d' from public.abstracts;
 select t.ok(true, 'organiser assigns the abstract to the reviewer');
 
--- Reviewer boundaries --------------------------------------------------------
+-- Reviewer boundaries (blind review) -----------------------------------------
 reset role;
+-- link the earlier upload to the abstract so attachment access can be tested
+update public.abstracts set file_path = '00000000-0000-0000-0000-00000000000b/x.pdf';
+insert into storage.objects(bucket_id,name) values ('abstract-files','00000000-0000-0000-0000-00000000000c/unrelated.pdf');
+select t.ok(
+  (select pg_get_function_result(p.oid) from pg_proc p where p.proname = 'conference_reviewer_assignments') !~* '(email|author|institution|co_authors|user_id)',
+  'blind-review function exposes no author fields');
 select t.as_user('00000000-0000-0000-0000-00000000000d', 'reviewer@example.org');
 set role authenticated;
-select t.expect_rows($$select * from public.abstracts$$, 1, 'reviewer sees the assigned abstract');
+select t.expect_rows($$select * from public.abstracts$$, 0, 'reviewer cannot read abstract rows directly (no author name/email)');
+select t.expect_rows($$select * from public.conference_reviewer_assignments()$$, 1, 'reviewer sees the assigned abstract through the blind function');
 select t.expect_rows($$select * from public.registrations$$, 0, 'reviewer cannot see registrations');
-select t.expect_rows($$select * from storage.objects$$, 0, 'reviewer cannot see an attachment not linked to the assignment');
+select t.expect_rows($$select * from storage.objects where name like '%/x.pdf'$$, 1, 'reviewer can open the assigned attachment');
+select t.expect_rows($$select * from storage.objects where name like '%unrelated%'$$, 0, 'reviewer cannot see an attachment not linked to the assignment');
 insert into public.reviews(assignment_id, reviewer_id, relevance, rigour, clarity, impact, recommendation, comments)
   select id, '00000000-0000-0000-0000-00000000000d', 4, 4, 4, 4, 'accept', 'Sound methodology and clear framing.' from public.review_assignments;
 select t.ok(true, 'reviewer submits a review for the assignment');
@@ -178,5 +151,20 @@ reset role;
 select t.as_user('00000000-0000-0000-0000-00000000000d', 'reviewer@example.org');
 set role authenticated;
 select t.expect_rows($$update public.reviews set comments = 'Changed after revocation of the role.' returning 1$$, 0, 'revoked reviewer can no longer edit reviews');
+select t.expect_error($$select * from public.conference_reviewer_assignments()$$, 'revoked reviewer cannot list assignments', '42501');
+select t.expect_rows($$select * from public.abstracts$$, 0, 'revoked reviewer cannot read abstracts');
+select t.expect_rows($$select * from storage.objects$$, 0, 'revoked reviewer cannot open attachments');
+reset role;
+set role anon;
+select t.expect_error($$select * from public.conference_reviewer_assignments()$$, 'anon cannot call the reviewer function', '42501');
+reset role;
+-- authors and organisers keep their access
+select t.as_user('00000000-0000-0000-0000-00000000000b', 'author@example.org');
+set role authenticated;
+select t.expect_rows($$select * from public.abstracts$$, 1, 'author still reads own abstract');
+reset role;
+select t.as_user('00000000-0000-0000-0000-00000000000a', 'organiser@example.org');
+set role authenticated;
+select t.expect_rows($$select * from public.abstracts$$, 1, 'organiser still reads all abstracts');
 reset role;
 \echo 'ALL SECURITY BOUNDARY TESTS PASSED'
