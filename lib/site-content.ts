@@ -76,12 +76,14 @@ export const VENUE = {
   directions: 'https://www.google.com/maps/dir/?api=1&destination=Federal%20University%20of%20Technology%20Akure%2C%20Nigeria',
   locate: 'https://www.google.com/maps/search/?api=1&query=Federal+University+of+Technology+Akure+Nigeria',
   photo: {
-    src: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Federal_University_of_Technology%2C_Akure%2C_Ondo_State11.jpg',
-    alt: 'Main entrance gate of the Federal University of Technology, Akure',
-    credit: 'MediaMOF / Wikimedia Commons',
-    creditUrl: 'https://commons.wikimedia.org/wiki/File:Federal_University_of_Technology,_Akure,_Ondo_State11.jpg',
-    licence: 'CC BY-SA 4.0',
-    licenceUrl: 'https://creativecommons.org/licenses/by-sa/4.0/'
+    src: '/images/futa-new-main-gate.jpg',
+    alt: 'New main entrance gate of the Federal University of Technology, Akure',
+    credit: 'Original photograph supplied for conference use'
+  },
+  monument: {
+    src: '/images/futa-monument-original.jpg',
+    alt: 'FUTA campus monument with the university crest and Technology for Self Reliance motto',
+    credit: '© ASS Photography (watermark retained in original photograph)'
   }
 } as const;
 

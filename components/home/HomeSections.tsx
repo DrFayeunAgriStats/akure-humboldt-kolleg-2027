@@ -161,8 +161,21 @@ export function Venue() {
         </div>
         <figure className="venue-photo">
           <VenuePhoto src={VENUE.photo.src} alt={VENUE.photo.alt} />
-          <figcaption>Photo: <a href={VENUE.photo.creditUrl} target="_blank" rel="noopener noreferrer">{VENUE.photo.credit}</a> · <a href={VENUE.photo.licenceUrl} target="_blank" rel="noopener noreferrer">{VENUE.photo.licence}</a> · Cropped for display</figcaption>
+          <figcaption>New FUTA main entrance · {VENUE.photo.credit}</figcaption>
         </figure>
+      </div>
+      <div className="venue-landmark">
+        <a className="venue-landmark-image" href={VENUE.monument.src} target="_blank" rel="noopener noreferrer" aria-label="View the original unedited FUTA monument photograph">
+          {/* Original supplied photograph; no AI retouching or watermark removal. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={VENUE.monument.src} alt={VENUE.monument.alt} width={865} height={1536} loading="lazy" decoding="async" />
+        </a>
+        <div className="venue-landmark-copy">
+          <p className="kicker">FUTA campus landmark</p>
+          <h3>The university monument</h3>
+          <p>A familiar expression of FUTA's identity, featuring its crest and the motto “Technology for Self Reliance.”</p>
+          <p className="muted">{VENUE.monument.credit}. Select the photograph to view the original.</p>
+        </div>
       </div>
       <div className="map-block">
         <h3 id="map-title">Find FUTA in Akure</h3>

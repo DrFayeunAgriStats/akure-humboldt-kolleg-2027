@@ -21,6 +21,8 @@ jobs:
           node-version: '22'
       - name: Install pinned dependencies
         run: npm install --no-audit --no-fund
+      - name: Confirm original venue image files exist
+        run: npm run check:assets
       - name: TypeScript check
         run: npm run typecheck
       - name: Production build
