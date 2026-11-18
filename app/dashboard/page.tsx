@@ -17,7 +17,7 @@ export default async function Page() {
   if (!hasConfig()) return <Shell title="My portal"><div className="message warn">The participant portal is temporarily unavailable.</div></Shell>;
   const db = await getSupabaseServer();
   const {data: {user}} = await db.auth.getUser();
-  if (!user) return <Shell title="My portal" kicker="PRIVATE ACCOUNT">
+  if (!user) return <Shell title="My portal" kicker="Private account">
     <div className="plain-card cta-card">
       <h2>Sign in to your portal</h2>
       <p>View your registration, submit abstracts and follow their review status.</p>
@@ -34,7 +34,7 @@ export default async function Page() {
   const isOrganiser = roles?.some(x => x.role === 'organiser');
   const isReviewer = roles?.some(x => x.role === 'reviewer');
 
-  return <Shell title="My portal" kicker="PRIVATE ACCOUNT" notice={<TestModeNotice show={settings.demo_mode} />}>
+  return <Shell title="My portal" kicker="Private account" intro="Your registration, abstracts and their review status in one place." wide notice={<TestModeNotice show={settings.demo_mode} />}>
     <div className="app-topbar"><span>Signed in as <strong>{user.email}</strong></span><SignOut /></div>
 
     {(isOrganiser || isReviewer) && <nav className="staff-links" aria-label="Staff workspaces">

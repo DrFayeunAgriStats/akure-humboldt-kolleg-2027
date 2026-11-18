@@ -19,7 +19,7 @@ const ERRORS: Record<string, string> = {
 export default async function Page({searchParams}: {searchParams: Promise<{error?: string; next?: string}>}) {
   const {error, next} = await searchParams;
   const message = error ? ERRORS[error] || ERRORS.auth : null;
-  return <Shell title="Sign in" kicker="PARTICIPANTS, REVIEWERS & ORGANISERS">
+  return <Shell title="Sign in" kicker="Participants, reviewers and organisers" intro="We email you a one-time sign-in link. No password is needed.">
     {message && <div className="message error" role="alert"><strong>Sign-in link problem.</strong> {message}</div>}
     <p>Enter your email address and we will send you a one-time sign-in link. No password is needed.
       Reviewer and organiser access is assigned by the organising committee.</p>

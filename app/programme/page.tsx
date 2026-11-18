@@ -18,7 +18,7 @@ export default async function Page(){
       .select('id,title,description,starts_at,ends_at,session_type,room').eq('published',true).order('starts_at');
     sessions=r.data||[];
   }
-  return <Shell title="Programme" kicker="22–25 FEBRUARY 2027 · FUTA, AKURE">
+  return <Shell title="Programme" kicker="22–25 February 2027 · FUTA, Akure" intro="Keynote lectures, research presentations and posters across the five scientific sub-themes." wide>
     <p>Federal University of Technology, Akure · All times in West Africa Time (WAT). The detailed scientific programme is subject to approval by the organising committee.</p>
     {sessions.length?<Schedule sessions={sessions}/>:<DraftProgramme/>}
   </Shell>;

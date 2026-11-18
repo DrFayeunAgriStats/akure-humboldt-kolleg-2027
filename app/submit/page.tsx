@@ -23,7 +23,7 @@ export default async function Page() {
     registered = Boolean(r.data);
   }
 
-  return <Shell title="Call for abstracts" kicker="FIVE SUB-THEMES · 250–300 WORDS"
+  return <Shell title="Call for abstracts" kicker="Five sub-themes · 250–300 words" intro="Share research on biodiversity, climate change and food security under one of the five scientific sub-themes."
     notice={<TestModeNotice show={settings.demo_mode && state === 'open'} />}>
     <div className="guidelines">
       <p className="lead-copy">Submit research under one of the five sub-themes. Submission is free; abstracts stay private unless accepted and released by the scientific committee.</p>

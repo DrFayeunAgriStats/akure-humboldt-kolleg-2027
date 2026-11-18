@@ -1,31 +1,8 @@
 'use client';
 import {useState} from 'react';
+import {OUTLINE_DAYS} from '@/lib/programme-outline';
 
-const days=[
- {date:'Monday 22 February 2027',theme:'Opening and scientific exchange',rows:[
-   ['08:30–09:30','Delegate check-in and welcome'],
-   ['09:30–10:30','Opening ceremony and conference introduction'],
-   ['10:45–12:15','Keynote presentations I and II (speakers to be confirmed)'],
-   ['13:15–14:45','Scientific plenary and Humboldt networking'],
-   ['15:00–16:30','Research discussions and poster exchange']
- ]},
- {date:'Tuesday 23 February 2027',theme:'Interdisciplinary science and innovation',rows:[
-   ['09:00–10:30','Keynote III and questions'],
-   ['10:45–12:30','Parallel biodiversity, climate and food-security research tracks'],
-   ['13:30–15:00','Technical presentations and discussions'],
-   ['15:15–16:30','Poster sessions and research collaboration forum']
- ]},
- {date:'Wednesday 24 February 2027',theme:'Young researchers and community engagement',rows:[
-   ['09:00–10:30','Early-career researcher presentations and mentoring'],
-   ['10:45–12:15','Keynote IV / interdisciplinary panel'],
-   ['13:15–15:30','Technical workshops or optional local field engagement'],
-   ['15:45–17:00','Scientific synthesis and closing resolutions']
- ]},
- {date:'Thursday 25 February 2027',theme:'Follow-up and departure',rows:[
-   ['Morning','Optional post-Kolleg networking, subject to committee approval'],
-   ['As arranged','Delegate departures and follow-up communication']
- ]}
-];
+const days=OUTLINE_DAYS;
 export function DraftProgramme(){
  const [active,setActive]=useState(0);
  return <section className="plain-card" aria-label="Outline four-day programme">
@@ -35,7 +12,7 @@ export function DraftProgramme(){
        aria-controls="draft-day-panel" className={active===i?'active':''} onClick={()=>setActive(i)}>Day {i+1}</button>)}
    </div>
    <div role="tabpanel" id="draft-day-panel" aria-labelledby={'day-tab-'+active}>
-     <h3>{days[active].date}</h3>
+     <h2>{days[active].date}</h2>
      <p className="help">{days[active].theme}</p>
      <div className="app-table-scroll" role="region" aria-label={days[active].date+' schedule'} tabIndex={0}><table className="styled-table">
        <thead><tr><th scope="col">Time (WAT)</th><th scope="col">Activity</th></tr></thead>
