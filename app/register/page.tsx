@@ -1,13 +1,73 @@
-import {Shell} from '@/components/Shell';
+import Link from 'next/link';
+import {Shell, TestModeNotice} from '@/components/Shell';
 import {RegisterForm} from './form';
-import {hasConfig,currentUser} from '@/lib/supabase/server';import {registrationEnabled,BID_DEMO_MODE} from '@/lib/conference-mode';
-export const metadata = { title: "Registration", description: "Try the working no-fee registration flow for the Akure Humboldt Kolleg 2027 bidding demonstration. Not official registration." };
-export const dynamic='force-dynamic';
-export default async function Page(){
- const user=hasConfig()?await currentUser():null;
- const isOpen=registrationEnabled()&&hasConfig();
- return <Shell title="Conference registration" kicker="WORKING DEMONSTRATION · FREE PARTICIPATION">
-   <div className="message">The proposed Kolleg is fully sponsored. <strong>There is no registration fee.</strong>{BID_DEMO_MODE&&<p><strong>Demonstration only:</strong> you can test registration now. This does not reserve an official conference place; demo records may be deleted before launch. Use only test information. <a href="/privacy">Read the demo privacy notice</a>.</p>}</div>
-   {!isOpen ? <div className="message warn"><strong>Registration is not open yet.</strong> Registration will be made official after committee approval. See the <a href="/">conference homepage</a> for scientific themes and announcements.</div> : <><p>Sign in with an email link, then test the registration workflow and receive a demo reference. Attendance is free; no payment step is required.</p>{!user?<div className="message"><strong>Sign in to begin.</strong> <a href="/login">Email me a sign-in link</a>. Once signed in, you can register and receive a demonstration reference.</div>:<RegisterForm/>}</>}
- </Shell>;
+import {getSupabaseServer, currentUser} from '@/lib/supabase/server';
+import {getConferenceSettings, registrationState, registrationReference, formatDeadline} from '@/lib/conference-mode';
+
+export const metadata = {
+  title: 'Registration',
+  description: 'Register to attend Akure Humboldt Kolleg 2027 at FUTA, Akure, 22–25 February 2027. Participation is free.',
+  alternates: {canonical: '/register'}
+};
+export const dynamic = 'force-dynamic';
+
+const CATEGORY: Record<string, string> = {student: 'Student', academic: 'Researcher / academic', professional: 'Professional / practitioner', other: 'Other'};
+
+export default async function Page() {
+  const settings = await getConferenceSettings();
+  const state = registrationState(settings);
+  const user = await currentUser();
+  let existing: {serial_number: number; full_name: string; institution: string; category: string; created_at: string; is_demo: boolean} | null = null;
+  if (user) {
+    const db = await getSupabaseServer();
+    const r = await db.from('registrations')
+      .select('serial_number,full_name,institution,category,created_at,is_demo')
+      .eq('user_id', user.id).eq('is_demo', settings.demo_mode).maybeSingle();
+    existing = r.data;
+  }
+
+  return <Shell title="Registration" kicker="22–25 FEBRUARY 2027 · FREE PARTICIPATION"
+    notice={<TestModeNotice show={settings.demo_mode && state === 'open'} />}>
+    <p className="lead-copy">The Kolleg is fully sponsored. <strong>There is no registration fee</strong> and no payment step.</p>
+
+    {existing ? <section className="plain-card summary-card" aria-labelledby="reg-summary">
+      <span className="eyebrow-small">{existing.is_demo ? 'TEST REGISTRATION' : 'YOUR REGISTRATION'}</span>
+      <h2 id="reg-summary">{registrationReference(existing.serial_number, existing.is_demo)}</h2>
+      <dl className="detail-list">
+        <div><dt>Name</dt><dd>{existing.full_name}</dd></div>
+        <div><dt>Institution</dt><dd>{existing.institution}</dd></div>
+        <div><dt>Category</dt><dd>{CATEGORY[existing.category] || existing.category}</dd></div>
+        <div><dt>Registered</dt><dd>{new Date(existing.created_at).toLocaleDateString('en-GB', {dateStyle: 'long', timeZone: 'Africa/Lagos'})}</dd></div>
+      </dl>
+      <p className="help">To correct these details, contact the organisers quoting your reference.</p>
+      <div className="action-row">
+        <Link className="app-button" href="/submit">Submit an abstract</Link>
+        <Link className="app-button app-btn-secondary" href="/dashboard">Go to my portal</Link>
+      </div>
+    </section>
+
+    : state === 'open' ? (user
+      ? <>
+          {settings.registration_deadline && <p className="help">Registration closes {formatDeadline(settings.registration_deadline)}.</p>}
+          <p>Signed in as <strong>{user.email}</strong>. Your confirmation will be sent to this address.</p>
+          <RegisterForm />
+        </>
+      : <div className="plain-card cta-card">
+          <h2>Start your registration</h2>
+          <ol className="step-list">
+            <li>Sign in with a one-time link sent to your email.</li>
+            <li>Complete the short registration form (about 2 minutes).</li>
+            <li>Receive your registration reference by email.</li>
+          </ol>
+          <Link className="app-button" href="/login?next=/register">Sign in to register</Link>
+        </div>)
+
+    : <div className="message" role="status">
+        <strong>{state === 'deadline-passed' ? 'Registration has closed.' : state === 'unavailable' ? 'Registration is temporarily unavailable.' : 'Registration is not open yet.'}</strong>{' '}
+        {state === 'deadline-passed' ? 'The registration deadline has passed. Contact the organisers if you have a question.'
+          : state === 'unavailable' ? 'Please try again shortly.'
+          : 'Registration will open once the organising committee announces it. Explore the scientific themes and programme in the meantime.'}{' '}
+        <Link href="/">Conference homepage</Link>
+      </div>}
+  </Shell>;
 }

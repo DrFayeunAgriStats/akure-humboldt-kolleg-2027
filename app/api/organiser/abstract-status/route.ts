@@ -20,7 +20,7 @@ export async function PATCH(req:NextRequest){
     .eq('id',data.id!).maybeSingle();
   if(readError||!previous)return error('Abstract not found or inaccessible.',404);
   if(data.is_published&&previous.is_demo)
-    return error('Demonstration abstracts cannot be released publicly. Use the private reviewer/author views instead.',403);
+    return error('Test records cannot be released publicly.',403);
 
   if((data.status==='accepted'||data.status==='rejected')&&previous.status!==data.status){
     const assignments=await db.from('review_assignments').select('id').eq('abstract_id',data.id!);
@@ -42,7 +42,7 @@ export async function PATCH(req:NextRequest){
   if(previous.status!==data.status&&['accepted','rejected'].includes(data.status!)){
     const ref=(previous.is_demo?'DEMO-AKH-ABS-':'AKH-ABS-')+String(previous.serial_number).padStart(4,'0');
     notified=await emailSend(previous.email,
-      (previous.is_demo?'Demonstration decision — ':'Abstract decision — ')+ref,
+      (previous.is_demo?'Test decision — ':'Abstract decision — ')+ref,
       '<p>The organiser has changed the status of your abstract <strong>'+ref+
       '</strong> to <strong>'+data.status+'</strong>.</p>'+
       '<p>Sign in to your conference dashboard to view your updated submission status.</p>'+

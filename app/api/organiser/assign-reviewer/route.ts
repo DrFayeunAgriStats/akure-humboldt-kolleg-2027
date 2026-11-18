@@ -33,6 +33,6 @@ export async function POST(req:NextRequest){
   const notified=email?await emailSend(email,'Review assignment — '+reference,
     '<p>You have been assigned an abstract for peer review: <strong>'+reference+
     '</strong>.</p><p>Access your reviewer workspace through the conference website.</p>'+
-    (paper.data.is_demo?'<p><strong>Demonstration only:</strong> this is not an official conference assignment.</p>':'')):false;
+    (paper.data.is_demo?'<p><strong>Pre-launch test record:</strong> this is not an official conference assignment.</p>':'')):false;
   return NextResponse.json({assigned:true,notified});
 }

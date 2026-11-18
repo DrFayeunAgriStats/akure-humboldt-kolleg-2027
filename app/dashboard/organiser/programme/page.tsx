@@ -2,8 +2,8 @@ import Link from 'next/link';
 import {Shell} from '@/components/Shell';
 import {getSupabaseServer,requireRole} from '@/lib/supabase/server';
 import {ConferenceContentManager} from './manager';
-import {BID_DEMO_MODE} from '@/lib/conference-mode';
 
+export const metadata={title:'Manage programme & speakers',robots:{index:false,follow:false}};
 export const dynamic='force-dynamic';
 export default async function Page(){
   const user=await requireRole('organiser');
@@ -15,7 +15,7 @@ export default async function Page(){
   ]);
   return <Shell title="Manage programme & speakers" kicker="ORGANISER CONTENT ADMINISTRATION">
     <p><Link href="/dashboard/organiser">← Back to organiser control centre</Link></p>
-    {BID_DEMO_MODE&&<div className="message warn"><strong>Demonstration mode:</strong> Publish only approved sample content, clearly identified as demonstration material. No keynote speaker, venue or session is officially confirmed by this portal.</div>}
+    <div className="message" role="note"><strong>Publishing is public.</strong> Publish only sessions and speakers the organising committee has confirmed; unpublished items stay private to organisers.</div>
     {(sessions.error||speakers.error)&&<div className="message error">Some programme data could not be loaded. Check permissions and refresh.</div>}
     <ConferenceContentManager initialSessions={sessions.data||[]} initialSpeakers={speakers.data||[]}/>
   </Shell>;

@@ -1,11 +1,10 @@
 'use client';
 import {FormEvent,useState} from 'react';
-import {useToast} from '@/components/ToastProvider';
 
 type Prior={relevance:number;rigour:number;clarity:number;impact:number;recommendation:string;comments:string};
 export function ReviewForm({assignmentId,initialReview}:{assignmentId:string;initialReview?:Prior}){
   const [busy,setBusy]=useState(false),[saved,setSaved]=useState(Boolean(initialReview));
-  const [message,setMessage]=useState('');const toast=useToast();
+  const [message,setMessage]=useState('');
   async function submit(e:FormEvent<HTMLFormElement>){
     e.preventDefault();setBusy(true);setMessage('');
     try{
@@ -13,10 +12,10 @@ export function ReviewForm({assignmentId,initialReview}:{assignmentId:string;ini
       const response=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,assignment_id:assignmentId})});
       const payload=await response.json();
       if(!response.ok)throw new Error(payload.error||'Review could not be saved.');
-      setSaved(true);setMessage('Assessment saved. The organiser can now inspect your recommendation.');toast('Review assessment saved.','success');
+      setSaved(true);setMessage('Assessment saved. The organiser can now inspect your recommendation.');
     }catch(e){
       const msg=e instanceof Error?e.message:'Network error. Try again.';
-      setMessage(msg);toast(msg,'error');
+      setMessage(msg);
     }finally{setBusy(false);}
   }
   return <form className="app-form" onSubmit={submit}>
@@ -39,6 +38,6 @@ export function ReviewForm({assignmentId,initialReview}:{assignmentId:string;ini
       <textarea name="comments" defaultValue={initialReview?.comments||''} required minLength={15} maxLength={4000} rows={5}/>
     </label>
     <button disabled={busy}>{busy?'Saving…':saved?'Update assessment':'Submit assessment'}</button>
-    {message&&<div role="status" className="message">{message}</div>}
+    {message&&<div role={saved?'status':'alert'} className={'message '+(saved?'success':'error')}>{message}</div>}
   </form>;
 }
