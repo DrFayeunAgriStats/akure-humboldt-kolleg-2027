@@ -78,6 +78,10 @@ export function LaunchControls({initial}: {initial: Settings}) {
       {s.abstract_deadline ? 'Abstracts close ' + formatDeadline(s.abstract_deadline) + '. ' : 'No abstract deadline set. '}
       Leave a deadline empty for none.
     </p>
+    {s.demo_mode && (s.registration_open || s.submissions_open) && <div className="message warn" role="note">
+      <strong>Public test entries are being accepted.</strong> While test mode is on, anyone visiting the public site can create
+      test registrations or abstracts. Recommended until the official launch: close registration and abstract submission here.
+      The public pages then say they have not opened yet; existing test records are kept.</div>}
     {s.demo_mode && <div className="message warn" role="note"><strong>Pre-launch test mode is on.</strong> Switching to official records is a reviewed database step
       (see LAUNCH_TRANSITION.md in the project repository) and cannot be done from this page.</div>}
   </section>;

@@ -85,15 +85,15 @@ export const VENUE = {
   }
 } as const;
 
-// Approved institutional identities (see ASSET_SOURCES.md). Logos are the approved
-// hotlinked files; a text fallback is shown if a remote logo cannot be loaded.
+// Approved institutional identities (see ASSET_SOURCES.md). Logos are self-hosted copies of
+// the approved files (AvH SVG byte-identical; FUTA crest resized only); a text fallback remains.
 export const INSTITUTIONS = {
   host: {
     role: 'Host institution',
     name: 'Federal University of Technology, Akure',
     short: 'FUTA',
     url: 'https://futa.edu.ng/',
-    logo: 'https://space4water.org/s4w/web/sites/default/files/images/organizations/logos/2024-08/AU%2BREC%2Blogos%2B-%2B2022-03-31T140738.693.png',
+    logo: '/branding/futa-crest.png',
     logoAlt: 'Federal University of Technology, Akure (FUTA) crest',
     logoWidth: 88, logoHeight: 88
   },
@@ -102,9 +102,9 @@ export const INSTITUTIONS = {
     name: 'Alexander von Humboldt Foundation',
     short: 'AvH',
     url: 'https://www.humboldt-foundation.de/en/',
-    logo: 'https://www.humboldt-foundation.de/fileadmin/Entdecken/Organisation/Styleguide/Logo/AvH_Logo_rgb.svg',
+    logo: '/branding/avh-logo-rgb.svg',
     logoAlt: 'Alexander von Humboldt Foundation logo',
-    logoWidth: 240, logoHeight: 80
+    logoWidth: 170, logoHeight: 80
   }
 } as const;
 

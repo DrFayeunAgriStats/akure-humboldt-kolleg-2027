@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import {InstitutionLogo} from '@/components/InstitutionLogo';
+import {VenuePhoto} from '@/components/VenuePhoto';
 import {
   ABOUT, AUDIENCE, CONFERENCE, CONTACT, HERO_IMAGE, INSTITUTIONS, PARTICIPATION_STEPS,
   PROGRAMME, SUBTHEMES, SUBTHEMES_INTRO, VENUE
@@ -51,8 +52,8 @@ export function About() {
   return <section id="about" className="section" aria-labelledby="about-title">
     <div className="container about-grid">
       <div>
-        <p className="kicker">About the Kolleg</p>
-        <h2 id="about-title">Science for connected challenges</h2>
+        <p className="kicker">Humboldt Kolleg 2027</p>
+        <h2 id="about-title">About the Kolleg</h2>
         <p className="lead">{ABOUT.lead}</p>
         {ABOUT.paragraphs.map(p => <p key={p.slice(0, 24)}>{p}</p>)}
         <ul className="facts-list">
@@ -75,7 +76,7 @@ export function Subthemes() {
   return <section id="subthemes" className="section themes-section" aria-labelledby="themes-title">
     <div className="container">
       <div className="section-head">
-        <div><p className="kicker kicker-light">Scientific programme</p><h2 id="themes-title">Five scientific sub-themes</h2></div>
+        <div><p className="kicker kicker-light">Scientific programme</p><h2 id="themes-title">Scientific themes</h2></div>
         <p>{SUBTHEMES_INTRO}</p>
       </div>
       <ol className="theme-list-home">
@@ -96,7 +97,7 @@ export function Programme() {
   return <section id="programme" className="section" aria-labelledby="programme-title">
     <div className="container">
       <div className="section-head">
-        <div><p className="kicker">Programme</p><h2 id="programme-title">Four days at FUTA</h2></div>
+        <div><p className="kicker">22–25 February 2027</p><h2 id="programme-title">Programme and dates</h2></div>
         <p>{PROGRAMME.summary}</p>
       </div>
       <ol className="programme-grid" aria-label="Outline of the four days">
@@ -145,8 +146,8 @@ export function Venue() {
     <div className="container">
       <div className="venue-grid">
         <div>
-          <p className="kicker">Venue</p>
-          <h2 id="venue-title">Federal University of Technology, Akure</h2>
+          <p className="kicker">Akure, Ondo State</p>
+          <h2 id="venue-title">Venue and host institution</h2>
           <p>{VENUE.intro}</p>
           <dl className="venue-details">
             <div><dt>Host</dt><dd>{INSTITUTIONS.host.name}</dd></div>
@@ -159,8 +160,7 @@ export function Venue() {
           </div>
         </div>
         <figure className="venue-photo">
-          {/* eslint-disable-next-line @next/next/no-img-element -- licensed Wikimedia Commons photograph, credited below */}
-          <img src={VENUE.photo.src} alt={VENUE.photo.alt} width={1200} height={800} loading="lazy" decoding="async" />
+          <VenuePhoto src={VENUE.photo.src} alt={VENUE.photo.alt} />
           <figcaption>Photo: <a href={VENUE.photo.creditUrl} target="_blank" rel="noopener noreferrer">{VENUE.photo.credit}</a> · <a href={VENUE.photo.licenceUrl} target="_blank" rel="noopener noreferrer">{VENUE.photo.licence}</a> · Cropped for display</figcaption>
         </figure>
       </div>
@@ -183,7 +183,7 @@ export function Partners() {
   return <section className="section section-paper" aria-labelledby="partners-title">
     <div className="container">
       <div className="section-head">
-        <div><p className="kicker">Institutions</p><h2 id="partners-title">Host and sponsor</h2></div>
+        <div><p className="kicker">Institutions</p><h2 id="partners-title">Host and support</h2></div>
       </div>
       <div className="partners-grid">
         {[INSTITUTIONS.host, INSTITUTIONS.sponsor].map(inst =>
