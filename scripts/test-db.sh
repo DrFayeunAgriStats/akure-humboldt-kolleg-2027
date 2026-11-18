@@ -14,7 +14,7 @@ BASELINE_MAX=20261114000200
 DBS=()
 trap 'for d in "${DBS[@]}"; do dropdb --if-exists "$d"; done' EXIT
 run() { psql -X -q -t -v ON_ERROR_STOP=1 -d "$1" -f "$2"; }
-report() { sed -n 's/^.*NOTICE:  \(PASS.*\)$/  \1/p; s/^\(.*\(PASSED\|REPRODUCED\)\)$/\1/p; /FAIL\|ERROR/p'; }
+report() { sed -n 's/^.*NOTICE:  \(PASS.*\)$/  \1/p; s/^\(.*\(PASSED\|REPRODUCED\)\)$/\1/p; /^psql:.*ERROR/p'; }   # failures surface as psql ERROR lines
 version() { basename "$1" | cut -d_ -f1; }
 
 build() { # $1=db $2=mode

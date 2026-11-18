@@ -73,36 +73,33 @@ select t.ok(not exists (
   where n.nspname in ('public','private') and p.prosecdef
     and coalesce(array_to_string(p.proconfig, ','), '') not like '%search_path=%'),
   'functions: every SECURITY DEFINER function pins search_path');
-select t.ok((select string_agg(p.proname, ',' order by p.proname) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-             where n.nspname = 'public' and p.prosecdef and has_function_privilege('authenticated', p.oid, 'EXECUTE'))
-  = 'conference_reviewer_assignments,conference_reviewer_directory,find_conference_account,grant_conference_reviewer,revoke_conference_reviewer',
-  'functions: the API-callable SECURITY DEFINER set is exactly the five reviewed functions');
+select t.ok((select coalesce(array_agg(t.sig(o) order by t.sig(o)), '{}') from t.public_api_function_oids() o
+             join pg_proc p on p.oid = o where p.prosecdef and has_function_privilege('authenticated', o, 'EXECUTE'))
+           = (select array_agg(signature order by signature) from t.approved_api_functions()),
+  'functions: the API-callable SECURITY DEFINER set is exactly the five approved signatures');
 
 -- Guard for FUTURE functions (default privileges cannot keep them private; see
--- migration 20261118000200 section 5). Every function in the API-exposed public
--- schema, of any security mode, must be unreachable by anon, and reachable by
--- authenticated only if it is on this reviewed allowlist. Functions owned by an
--- extension (e.g. pgcrypto, which Supabase installs in schema extensions) are excluded.
-select t.ok(not exists (
-  select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-  where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
-    and has_function_privilege('anon', p.oid, 'EXECUTE')),
+-- migration 20261118000200 section 5). Uses the shared guard in _helpers.sql, which
+-- matches EXACT signatures: an overload of an approved name is a violation.
+select t.ok((select bool_and(fn is not null) from t.approved_api_functions()),
+  'approved: all five approved signatures exist'
+  || coalesce(' — missing: ' || (select string_agg(signature, ', ') from t.approved_api_functions() where fn is null), ''));
+select t.ok(not exists (select 1 from t.guard_anon_violations()),
   'guard: no function in schema public is executable by anon'
-  || coalesce(' — offending: ' || (select string_agg(p.oid::regprocedure::text, ', ') from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-       where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
-    and has_function_privilege('anon', p.oid, 'EXECUTE')), ''));
+  || coalesce(' — offending: ' || (select string_agg(v, ', ') from t.guard_anon_violations() v), ''));
+select t.ok(not exists (select 1 from t.guard_authenticated_violations()),
+  'guard: authenticated can execute only the five approved signatures in schema public'
+  || coalesce(' — not approved: ' || (select string_agg(v, ', ') from t.guard_authenticated_violations() v), ''));
+-- Each approved function stays reachable by its intended role (authenticated) and
+-- closed to anon and PUBLIC.
 select t.ok(not exists (
-  select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-  where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
-    and has_function_privilege('authenticated', p.oid, 'EXECUTE')
-    and p.proname not in ('conference_reviewer_assignments','conference_reviewer_directory','find_conference_account',
-                          'grant_conference_reviewer','revoke_conference_reviewer')),
-  'guard: authenticated can execute only the reviewed allowlist of public functions'
-  || coalesce(' — not on allowlist: ' || (select string_agg(p.oid::regprocedure::text, ', ') from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-       where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
-    and has_function_privilege('authenticated', p.oid, 'EXECUTE')
-         and p.proname not in ('conference_reviewer_assignments','conference_reviewer_directory','find_conference_account',
-                               'grant_conference_reviewer','revoke_conference_reviewer')), ''));
+  select 1 from t.approved_api_functions() a join pg_proc p on p.oid = a.fn
+  where not has_function_privilege('authenticated', a.fn, 'EXECUTE')
+     or has_function_privilege('anon', a.fn, 'EXECUTE')
+     or exists (select 1 from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) x where x.grantee = 0 and x.privilege_type = 'EXECUTE')),
+  'approved: each of the five is executable by authenticated and not by anon or PUBLIC'
+  || coalesce(' — wrong: ' || (select string_agg(a.signature, ', ') from t.approved_api_functions() a
+       where a.fn is not null and (not has_function_privilege('authenticated', a.fn, 'EXECUTE') or has_function_privilege('anon', a.fn, 'EXECUTE'))), ''));
 
 -- Behaviour: the audited gaps are closed and legitimate actions still work.
 insert into auth.users(id, email) values
@@ -126,6 +123,8 @@ update public.conference_settings set registration_open = true where id = 1;
 select t.expect_error($$insert into public.user_roles(user_id, role) values ('00000000-0000-0000-0000-0000000000e3','reviewer')$$, 'closed: organiser cannot insert a role directly', '42501');
 select t.expect_error($$delete from public.user_roles where role = 'organiser'$$, 'closed: organiser cannot delete roles directly', '42501');
 select t.expect_rows($$select * from public.grant_conference_reviewer('candidate@example.org')$$, 1, 'works: organiser grants reviewer through the audited function');
+select t.expect_rows($$select * from public.conference_reviewer_directory()$$, 1, 'works: organiser lists reviewers (conference_reviewer_directory())');
+select t.expect_rows($$select * from public.find_conference_account('candidate@example.org')$$, 1, 'works: organiser looks up an account (find_conference_account(text))');
 select t.ok(public.revoke_conference_reviewer('00000000-0000-0000-0000-0000000000e3'), 'works: organiser revokes reviewer through the audited function');
 select t.expect_error($$select public.grant_conference_reviewer('organiser@example.org')$$, 'closed: organiser cannot make themselves a reviewer (live rule kept)', '42501');
 select t.expect_error($$update public.abstracts set is_demo = false$$, 'closed: organiser cannot flip a test abstract to official', '42501');
@@ -151,6 +150,7 @@ insert into public.reviews as t (assignment_id, reviewer_id, relevance, rigour, 
   on conflict (assignment_id) do update set assignment_id = excluded.assignment_id, reviewer_id = excluded.reviewer_id, relevance = excluded.relevance,
     rigour = excluded.rigour, clarity = excluded.clarity, impact = excluded.impact, recommendation = excluded.recommendation, comments = excluded.comments;
 select t.ok((select recommendation = 'revise' from public.reviews), 'works: reviewer saves and then edits a review via the API upsert statement');
+select t.expect_rows($$select * from public.conference_reviewer_assignments()$$, 1, 'works: reviewer lists assignments (conference_reviewer_assignments())');
 reset role;
 select t.as_user('00000000-0000-0000-0000-0000000000a3', 'organiser@example.org');
 set role authenticated;
