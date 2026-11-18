@@ -27,3 +27,10 @@ grant select, insert on storage.objects to authenticated;
 create function storage.foldername(name text) returns text[] language sql immutable as
 $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
 grant execute on function storage.foldername(text) to authenticated;
+
+-- Supabase's standard schema-level default privileges for objects created in public
+-- by the migration role (so fresh-database tests start from the same defaults as a
+-- real Supabase project).
+alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;

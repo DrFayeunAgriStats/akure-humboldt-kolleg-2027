@@ -58,3 +58,9 @@ grant all on table public.registrations, public.abstracts, public.review_assignm
 grant all on table public.user_roles to anon;
 grant all on table public.user_roles to authenticated;
 revoke update on table public.user_roles from authenticated;
+
+-- 4. Live default privileges: in addition to Supabase's schema-level defaults (in the
+--    local stub), the live project has a GLOBAL default EXECUTE grant to authenticated
+--    (advisory-board read-only check, 2026-11-18). Combined with PostgreSQL's built-in
+--    EXECUTE-to-PUBLIC default, schema-level REVOKEs cannot make new functions private.
+alter default privileges grant execute on functions to authenticated;

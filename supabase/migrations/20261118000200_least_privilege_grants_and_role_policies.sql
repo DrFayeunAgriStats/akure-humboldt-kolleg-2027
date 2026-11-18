@@ -72,9 +72,24 @@ begin
 end $$;
 
 ------------------------------------------------------------------------------
--- 5. Future tables and functions created by the migration owner start closed
---    (Supabase's project defaults grant ALL to anon/authenticated, which is how
---    the broad live grants arose). New objects need explicit, reviewed grants.
+-- 5. Default privileges: deliberately NARROW guarantee.
+--
+--    What this does: removes the SCHEMA-LEVEL defaults that Supabase sets on schema
+--    public for objects created by the role running this migration (postgres), so:
+--      * new TABLES in public get no automatic grants for anon/authenticated;
+--      * new FUNCTIONS in public lose Supabase's schema-level grants.
+--
+--    What it does NOT do: make new functions private. PostgreSQL grants EXECUTE on
+--    every new function to PUBLIC, and the live project also has a GLOBAL default
+--    EXECUTE grant to authenticated. A schema-level REVOKE cannot override either,
+--    and changing global defaults would also affect Supabase-managed schemas, so
+--    this migration intentionally leaves global defaults alone.
+--
+--    Control instead: every migration that creates a function in public must
+--    REVOKE EXECUTE explicitly (from public, anon and, unless intended, authenticated).
+--    CI enforces it: supabase/tests/15_privilege_matrix.sql fails if any function
+--    in public is executable by anon, or by authenticated without being on the
+--    reviewed allowlist, and 16_default_privileges.sql records the real defaults.
 ------------------------------------------------------------------------------
 alter default privileges in schema public revoke all on tables from anon, authenticated;
-alter default privileges in schema public revoke execute on functions from public, anon;
+alter default privileges in schema public revoke execute on functions from anon, authenticated;

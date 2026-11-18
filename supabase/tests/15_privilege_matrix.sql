@@ -78,6 +78,32 @@ select t.ok((select string_agg(p.proname, ',' order by p.proname) from pg_proc p
   = 'conference_reviewer_assignments,conference_reviewer_directory,find_conference_account,grant_conference_reviewer,revoke_conference_reviewer',
   'functions: the API-callable SECURITY DEFINER set is exactly the five reviewed functions');
 
+-- Guard for FUTURE functions (default privileges cannot keep them private; see
+-- migration 20261118000200 section 5). Every function in the API-exposed public
+-- schema, of any security mode, must be unreachable by anon, and reachable by
+-- authenticated only if it is on this reviewed allowlist. Functions owned by an
+-- extension (e.g. pgcrypto, which Supabase installs in schema extensions) are excluded.
+select t.ok(not exists (
+  select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
+    and has_function_privilege('anon', p.oid, 'EXECUTE')),
+  'guard: no function in schema public is executable by anon'
+  || coalesce(' — offending: ' || (select string_agg(p.oid::regprocedure::text, ', ') from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+       where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
+    and has_function_privilege('anon', p.oid, 'EXECUTE')), ''));
+select t.ok(not exists (
+  select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
+    and has_function_privilege('authenticated', p.oid, 'EXECUTE')
+    and p.proname not in ('conference_reviewer_assignments','conference_reviewer_directory','find_conference_account',
+                          'grant_conference_reviewer','revoke_conference_reviewer')),
+  'guard: authenticated can execute only the reviewed allowlist of public functions'
+  || coalesce(' — not on allowlist: ' || (select string_agg(p.oid::regprocedure::text, ', ') from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+       where n.nspname = 'public' and not exists (select 1 from pg_depend d where d.classid = 'pg_proc'::regclass and d.objid = p.oid and d.deptype = 'e')
+    and has_function_privilege('authenticated', p.oid, 'EXECUTE')
+         and p.proname not in ('conference_reviewer_assignments','conference_reviewer_directory','find_conference_account',
+                               'grant_conference_reviewer','revoke_conference_reviewer')), ''));
+
 -- Behaviour: the audited gaps are closed and legitimate actions still work.
 insert into auth.users(id, email) values
   ('00000000-0000-0000-0000-0000000000a3', 'organiser@example.org'),

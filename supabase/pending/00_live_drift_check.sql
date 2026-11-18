@@ -50,6 +50,15 @@ select 'constraint' as section, conrelid::regclass || ' :: ' || conname as name,
 from pg_constraint where conrelid in ('public.registrations'::regclass, 'public.abstracts'::regclass) order by 2;
 select 'settings' as section, 'conference_settings' as name, row_to_json(s)::text as detail from public.conference_settings s;
 
--- 7. Run separately (fails harmlessly if the project was set up without the Supabase CLI):
+-- 7. Default privileges (global entries have schema '-'). Schema-level REVOKEs cannot
+--    override global entries or PostgreSQL's built-in EXECUTE-to-PUBLIC for functions.
+select 'default_acl' as section,
+       coalesce(n.nspname, '-') || ' :: ' || pg_get_userbyid(d.defaclrole) || ' :: ' ||
+       case d.defaclobjtype when 'r' then 'tables' when 'f' then 'functions' when 'S' then 'sequences' when 'T' then 'types' when 'n' then 'schemas' end as name,
+       d.defaclacl::text as detail
+from pg_default_acl d left join pg_namespace n on n.oid = d.defaclnamespace
+order by 2;
+
+-- 8. Run separately (fails harmlessly if the project was set up without the Supabase CLI):
 --    which repository migrations the live project has recorded.
 -- select version, name from supabase_migrations.schema_migrations order by version;

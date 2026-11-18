@@ -26,6 +26,8 @@ Everything is controlled by one database row, `public.conference_settings` (id =
 
 ## Deploying this release (before any launch decision)
 
+Complete and sign off `docs/STAGING_ACCEPTANCE.md` on staging before any production step.
+
 The live audit of 2026-11-18 (`docs/audit/`) is reproduced in CI by `supabase/tests/fixtures/live_drift_2026-11-18.sql`. Every suite runs against both a fresh database and that live-like clone.
 
 | Order | Migration | Compatible with app currently live? | Compatible with this PR's app? |
