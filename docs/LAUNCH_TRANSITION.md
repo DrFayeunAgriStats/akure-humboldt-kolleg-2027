@@ -26,12 +26,28 @@ Everything is controlled by one database row, `public.conference_settings` (id =
 
 ## Deploying this release (before any launch decision)
 
-1. **Drift check (read-only).** Run `supabase/pending/00_live_drift_check.sql` on the live project and review the output against the repository. Look for extra permissive policies, function grants to `anon`/`PUBLIC`, and constraint names.
-2. **Reconcile.** Replace the reconstructed bodies in `20261117000100` with the exact live definitions. Thanks to its if-absent guard, the migration stays a no-op on live.
-3. **Backup**, then apply, in order and each in a transaction, on a staging copy first and then on live:
-   `20261117000100` → `20261117000200` → `20261118000100`. Use `supabase db push` only if the live migration history already lists the earlier files; otherwise use the SQL editor.
-4. **Then** deploy the application. The new reviewer workspace calls `conference_reviewer_assignments()`, and reviewer grants call `grant_conference_reviewer()`. Deploying the app before the migrations would break both.
-5. Post-deploy smoke test: Launch controls show the live values; a reviewer sees their assignments; a participant gets 403 from organiser APIs.
+The live audit of 2026-11-18 (`docs/audit/`) is reproduced in CI by `supabase/tests/fixtures/live_drift_2026-11-18.sql`. Every suite runs against both a fresh database and that live-like clone.
+
+| Order | Migration | Compatible with app currently live? | Compatible with this PR's app? |
+|---|---|---|---|
+| 1 | `20261117000100` reconcile live functions (no-op on live) | Yes | Yes |
+| 2 | `20261117000200` grant/revoke functions, deadline gates, audit columns | Yes | Required |
+| 3 | `20261118000100` blind review and revocation | **No**: old reviewer page loses abstract text | Required |
+| 4 | `20261118000200` least-privilege grants, drop direct role-write policies | **No**: old organiser panel's reviewer grant stops working | Required |
+
+1. **Re-run the read-only drift check** (`supabase/pending/00_live_drift_check.sql`) and confirm that the live state still matches the audit. In particular, compare the exact text of the two `user_roles` write policies. The fixture reconstructs them from the audit description.
+2. **Backup** (and verify that it restores).
+3. **Staging:** restore the backup to staging, apply 1 → 4, deploy this PR's build to staging, and run the smoke test below.
+4. **Production, step A (any time):** apply 1 and 2, each in a transaction. The live app keeps working.
+5. **Production, step B (short maintenance window, minutes):** apply 3 and 4 in one transaction, then immediately promote the already-built deployment of this PR. Between the two, reviewer pages and reviewer grants are briefly unavailable; registration and submission are unaffected.
+6. **Smoke test:**
+   - Launch controls show `demo_mode=true` and the live open/closed values.
+   - A reviewer sees assignments without author names.
+   - Granting and removing a reviewer works.
+   - A participant gets 403 from the organiser APIs.
+   - The drift check shows no TRUNCATE/DELETE grants to `anon`/`authenticated` and no UPDATE on `demo_mode`.
+
+Use the SQL editor rather than `supabase db push` unless the live migration history already lists every earlier file.
 
 ## Procedure for the official switch
 

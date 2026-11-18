@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
   if (rpcError) {
     if (rpcError.code === 'P0002') return error('No account uses that email. Ask the reviewer to sign in to the conference portal once, then try again.', 404);
     if (rpcError.code === '23505') return error('This account is already an authorised reviewer.', 409);
+    if (rpcError.code === '42501' && /themselves/.test(rpcError.message)) return error('You cannot grant the reviewer role to your own account.', 409);
     if (rpcError.code === '42501') return error('Organiser access required.', 403);
     return error('Reviewer access could not be granted.', 500);
   }

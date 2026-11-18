@@ -51,6 +51,10 @@ begin
   if v_user is null then
     raise exception 'no conference account for that email' using errcode = 'P0002';
   end if;
+  -- Same rule as the live roles_organiser_add_reviewer policy: no self-grant.
+  if v_user = (select auth.uid()) then
+    raise exception 'organisers cannot grant the reviewer role to themselves' using errcode = '42501';
+  end if;
   insert into public.user_roles(user_id, role, granted_by)
   values (v_user, 'reviewer', (select auth.uid()))
   on conflict (user_id, role) do nothing;

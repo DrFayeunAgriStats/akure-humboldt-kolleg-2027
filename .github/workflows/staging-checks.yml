@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 10
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres
         ports:
@@ -49,5 +49,5 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-      - name: Migrations and security-boundary tests
+      - name: Migrations, privilege matrix, security boundaries and Option A (fresh + live-clone)
         run: scripts/test-db.sh

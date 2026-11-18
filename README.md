@@ -10,7 +10,7 @@ The Local Organising Committee has commissioned this as the official conference 
 
 - **Launch controls live in the database** (`public.conference_settings`). Organisers open or close registration and abstract submission, and set deadlines, from **Organiser control centre → Launch controls**. The same row is enforced by row-level security, so the site and the database cannot disagree.
 - **`demo_mode`** decides whether new records are test (`DEMO-` references) or official. Only a database administrator can change it.
-- **Reviewer access** is granted and revoked by organisers in the dashboard. A server route calls audited, organiser-only database functions with the organiser's own session. No service-role key is used, and clients still cannot write `user_roles` directly.
+- **Reviewer access** is granted and revoked by organisers in the dashboard. A server route calls audited, organiser-only database functions with the organiser's own session. No service-role key is used. After migration `20261118000200`, clients (organisers included) hold only SELECT on `user_roles`, so the audited functions are the only way to change roles.
 - **Database tests:** `scripts/test-db.sh` applies every migration to a throwaway local PostgreSQL and runs the security-boundary suite in `supabase/tests/`.
 
 ## Local development

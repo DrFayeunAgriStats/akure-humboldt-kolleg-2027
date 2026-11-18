@@ -24,7 +24,7 @@ select t.expect_error($$insert into public.registrations(user_id,email,full_name
   values ('00000000-0000-0000-0000-00000000000b','author@example.org','Ada Author','FUTA','Nigeria','humboldtian',false,true,'academic',true,true)$$,
   'anon cannot register', '42501');
 select t.expect_error($$select public.grant_conference_reviewer('other@example.org')$$, 'anon cannot call grant_conference_reviewer', '42501');
-select t.expect_error($$select * from public.find_conference_account('author@example.org')$$, 'anon cannot look up accounts', '42501');
+select t.expect_error($$select * from public.find_conference_account('author@example.org')$$, 'anon cannot execute the account lookup (no EXECUTE grant)', '42501');
 select t.expect_rows($$select * from public.conference_settings$$, 1, 'anon can read launch settings');
 reset role;
 
@@ -90,8 +90,8 @@ select t.expect_error($$insert into public.user_roles(user_id, role) values ('00
   'participant cannot self-grant reviewer', '42501');
 select t.expect_error($$select public.grant_conference_reviewer('author@example.org')$$, 'participant cannot call grant_conference_reviewer', '42501');
 select t.expect_error($$select public.revoke_conference_reviewer('00000000-0000-0000-0000-00000000000a')$$, 'participant cannot call revoke_conference_reviewer', '42501');
-select t.expect_error($$select * from public.conference_reviewer_directory()$$, 'participant cannot read reviewer directory', '42501');
-select t.expect_error($$select * from public.find_conference_account('organiser@example.org')$$, 'participant cannot look up accounts', '42501');
+select t.expect_error($$select * from public.conference_reviewer_directory()$$, 'participant cannot read reviewer directory (live organiser check)', 'P0001');
+select t.expect_error($$select * from public.find_conference_account('organiser@example.org')$$, 'participant cannot look up accounts (live organiser check)', 'P0001');
 select t.expect_rows($$update public.conference_settings set registration_open = false returning 1$$, 0, 'participant cannot change launch settings');
 
 -- Cross-user privacy ---------------------------------------------------------
