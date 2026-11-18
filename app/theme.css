@@ -432,7 +432,7 @@ details.plain-card > summary { cursor: pointer; }
 /* Venue */
 .venue-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
 .venue-photo { margin: 0; border-radius: var(--radius-lg); overflow: hidden; background: var(--forest-800); }
-.venue-photo img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; }
+.venue-photo img { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; display: block; }
 .venue-photo-fallback { aspect-ratio: 3 / 2; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--forest-800), var(--forest-900)); color: #d5e2d9; font: 600 1.1rem/1.2 var(--font-serif); letter-spacing: .04em; }
 .venue-photo figcaption { padding: .6rem .9rem; font-size: .82rem; color: #d5e2d9; background: var(--forest-900); }
 .venue-photo figcaption a { color: #fff; }
@@ -484,3 +484,11 @@ details.plain-card > summary { cursor: pointer; }
   .site-nav { gap: .75rem; }
   .site-nav-links a { padding: .55rem .5rem; }
 }
+
+/* FUTA's original, unedited campus monument photo (link opens the original file). */
+.venue-landmark { margin-top: 1.5rem; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(1.2rem, 3vw, 2rem); align-items: center; padding: 1rem; background: var(--paper); border: 1px solid var(--line-soft); border-radius: var(--radius-lg); }
+.venue-landmark-image { display: block; min-width: 0; overflow: hidden; border-radius: var(--radius); background: #111; }
+.venue-landmark-image img { display: block; width: 100%; height: 240px; object-fit: cover; object-position: center; }
+.venue-landmark-copy h3 { margin-bottom: .5rem; }
+.venue-landmark-copy p { max-width: 60ch; }
+@media (max-width: 650px) { .venue-landmark { grid-template-columns: 1fr; } .venue-landmark-image img { height: 210px; } }
