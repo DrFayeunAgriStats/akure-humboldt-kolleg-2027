@@ -10,7 +10,7 @@ export const metadata = {
 // NOTE FOR THE ORGANISING COMMITTEE: this notice should be reviewed and approved by
 // the LOC (and FUTA's data-protection contact) before official registration opens.
 export default function Page() {
-  return <Shell title="Privacy notice" kicker="AKURE HUMBOLDT KOLLEG 2027">
+  return <Shell title="Privacy notice" kicker="Akure Humboldt Kolleg 2027" intro="How we collect, use and protect the information of participants, authors and reviewers.">
     <div className="prose">
       <h2>Who is responsible</h2>
       <p>This website is operated for the Local Organising Committee of Akure Humboldt Kolleg 2027, hosted by the

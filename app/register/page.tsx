@@ -26,7 +26,7 @@ export default async function Page() {
     existing = r.data;
   }
 
-  return <Shell title="Registration" kicker="22–25 FEBRUARY 2027 · FREE PARTICIPATION"
+  return <Shell title="Registration" kicker="22–25 February 2027 · Free participation" intro="Register once to attend the Kolleg and to submit abstracts. It takes about two minutes."
     notice={<TestModeNotice show={settings.demo_mode && state === 'open'} />}>
     <p className="lead-copy">The Kolleg is fully sponsored. <strong>There is no registration fee</strong> and no payment step.</p>
 

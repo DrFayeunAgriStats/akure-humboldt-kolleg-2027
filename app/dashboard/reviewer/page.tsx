@@ -33,12 +33,12 @@ export default async function Page(){
     const link=x.file_path?await db.storage.from('abstract-files').createSignedUrl(x.file_path,180):null;
     return {...x,attachment:link?.data?.signedUrl||null};
   }));
-  return <Shell title="My assigned abstract reviews" kicker="PEER REVIEW WORKSPACE">
+  return <Shell title="My assigned reviews" kicker="Peer review workspace" intro="Blind review: author identities are withheld. Score each abstract and give constructive comments." wide>
     <p>Signed in as <strong>{me.email}</strong>. You can assess only abstracts assigned to your account. Author identities are withheld for blind review.</p>
     {assignments.error&&<div className="message error">Assignments could not be loaded. Please refresh.</div>}
     {papers.length?papers.map(x=><article className="plain-card" key={x.assignment_id}>
       <div className="eyebrow-small">{abstractReference(x.serial_number,x.is_demo)}{x.is_demo?' · TEST RECORD':''} · Sub-theme {x.track} · {x.presentation_type==='poster'?'Poster':'Oral'}</div>
-      <h3>{x.title}</h3><p>{x.body}</p>{x.keywords?.length?<p className="help">Keywords: {x.keywords.join(', ')}</p>:null}
+      <h2>{x.title}</h2><p>{x.body}</p>{x.keywords?.length?<p className="help">Keywords: {x.keywords.join(', ')}</p>:null}
       {x.attachment?<p><a href={x.attachment} className="app-button" target="_blank" rel="noreferrer">Open submitted attachment (temporary secure link) ↗</a></p>:
         <p className="help">{x.file_path?'Attachment unavailable; contact the organiser.':'No attachment supplied. Review the abstract text above.'}</p>}
       <ReviewForm assignmentId={x.assignment_id} initialReview={existing.get(x.assignment_id)}/>

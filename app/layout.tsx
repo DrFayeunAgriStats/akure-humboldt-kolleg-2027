@@ -1,6 +1,11 @@
 import './globals.css';
+import {Inter, Source_Serif_4} from 'next/font/google';
 import {ToastProvider} from '@/components/ToastProvider';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+
+// Self-hosted at build time by next/font (no render-blocking third-party stylesheet).
+const serif = Source_Serif_4({ subsets: ['latin'], weight: ['400', '600', '700'], style: ['normal', 'italic'], variable: '--font-serif-face', display: 'swap' });
+const sans = Inter({ subsets: ['latin'], variable: '--font-sans-face', display: 'swap' });
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://akure-humboldt-kolleg-2027.vercel.app';
 const isPublic = process.env.SITE_PUBLIC === 'true';
@@ -19,13 +24,10 @@ export const metadata: Metadata = {
   robots: { index: isPublic, follow: isPublic }
 };
 
+export const viewport: Viewport = { themeColor: '#123528', colorScheme: 'light' };
+
 export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en">
-    <head>
-      <link rel="preconnect" href="https://fonts.googleapis.com"/>
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"/>
-    </head>
+  return <html lang="en-GB" className={`${serif.variable} ${sans.variable}`}>
     <body><ToastProvider>{children}</ToastProvider></body>
   </html>;
 }

@@ -19,7 +19,7 @@ export function ReviewForm({assignmentId,initialReview}:{assignmentId:string;ini
     }finally{setBusy(false);}
   }
   return <form className="app-form" onSubmit={submit}>
-    <h4>Scientific assessment {saved?<span className="pill">Saved — editable</span>:null}</h4>
+    <h3>Scientific assessment {saved?<span className="pill">Saved — editable</span>:null}</h3>
     <p className="help">Score each criterion from 1 (poor) to 5 (excellent). Your recommendation is advisory; the organiser makes the decision.</p>
     {(['relevance','rigour','clarity','impact'] as const).map(field=><label key={field}>
       {field[0].toUpperCase()+field.slice(1)}

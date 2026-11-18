@@ -105,7 +105,7 @@ export function ConferenceContentManager({initialSessions,initialSpeakers}:{init
     <section className="plain-card" aria-labelledby="sessions-heading">
       <h2 id="sessions-heading">Programme sessions</h2>
       <p className="help">Create a draft session, edit its timing in West Africa Time (WAT), and explicitly publish it. Dates and venues should reflect approved information, not invented details.</p>
-      <div className="app-table-scroll"><table className="styled-table">
+      <div className="app-table-scroll" role="region" aria-label="Sessions table" tabIndex={0}><table className="styled-table">
         <thead><tr><th>Date & time (WAT)</th><th>Session</th><th>Room</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>{sessions.length?sessions.map(s=><tr key={s.id}>
           <td>{formatDate(s.starts_at)} – {new Date(s.ends_at).toLocaleTimeString('en-NG',{timeZone:'Africa/Lagos',hour:'2-digit',minute:'2-digit'})}</td>
@@ -153,7 +153,7 @@ export function ConferenceContentManager({initialSessions,initialSpeakers}:{init
     <section className="plain-card" aria-labelledby="speakers-heading">
       <h2 id="speakers-heading">Speakers</h2>
       <p className="help">Add only real, confirmed or authorised speaker details. Draft entries remain private to organisers.</p>
-      <div className="app-table-scroll"><table className="styled-table">
+      <div className="app-table-scroll" role="region" aria-label="Speakers table" tabIndex={0}><table className="styled-table">
         <thead><tr><th>Name</th><th>Institution</th><th>Presentation</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>{speakers.length?speakers.map(s=><tr key={s.id}>
           <td><strong>{s.name}</strong></td><td>{s.institution||'Not set'}</td><td>{s.talk_title||'Not set'}</td><td>{s.published?'Published':'Draft'}</td>
