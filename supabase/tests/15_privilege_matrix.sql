@@ -106,6 +106,28 @@ select t.expect_error($$update public.abstracts set is_demo = false$$, 'closed: 
 select t.expect_error($$update public.abstracts set author_name = 'Changed'$$, 'closed: organiser cannot rewrite author fields', '42501');
 select t.expect_rows($$update public.abstracts set status = 'under_review' returning 1$$, 1, 'works: organiser records a status decision');
 select t.expect_error($$truncate public.reviews$$, 'closed: TRUNCATE refused for a signed-in session', '42501');
+-- Upserts exactly as Supabase's REST API issues them (Prefer: resolution=merge-duplicates
+-- sets every payload column), so the column grants are proven against production SQL.
+insert into public.review_assignments as t (abstract_id, reviewer_id)
+  select id, '00000000-0000-0000-0000-0000000000e3' from public.abstracts
+  on conflict (abstract_id, reviewer_id) do update set abstract_id = excluded.abstract_id, reviewer_id = excluded.reviewer_id;
+select t.ok(true, 'works: organiser assigns a reviewer via the API upsert statement');
+reset role;
+insert into public.user_roles(user_id, role) values ('00000000-0000-0000-0000-0000000000e3', 'reviewer');
+select t.as_user('00000000-0000-0000-0000-0000000000e3', 'candidate@example.org');
+set role authenticated;
+insert into public.reviews as t (assignment_id, reviewer_id, relevance, rigour, clarity, impact, recommendation, comments)
+  select id, '00000000-0000-0000-0000-0000000000e3', 4, 4, 4, 4, 'accept', 'First assessment of the abstract.' from public.review_assignments
+  on conflict (assignment_id) do update set assignment_id = excluded.assignment_id, reviewer_id = excluded.reviewer_id, relevance = excluded.relevance,
+    rigour = excluded.rigour, clarity = excluded.clarity, impact = excluded.impact, recommendation = excluded.recommendation, comments = excluded.comments;
+insert into public.reviews as t (assignment_id, reviewer_id, relevance, rigour, clarity, impact, recommendation, comments)
+  select id, '00000000-0000-0000-0000-0000000000e3', 3, 4, 5, 4, 'revise', 'Edited assessment after second reading.' from public.review_assignments
+  on conflict (assignment_id) do update set assignment_id = excluded.assignment_id, reviewer_id = excluded.reviewer_id, relevance = excluded.relevance,
+    rigour = excluded.rigour, clarity = excluded.clarity, impact = excluded.impact, recommendation = excluded.recommendation, comments = excluded.comments;
+select t.ok((select recommendation = 'revise' from public.reviews), 'works: reviewer saves and then edits a review via the API upsert statement');
+reset role;
+select t.as_user('00000000-0000-0000-0000-0000000000a3', 'organiser@example.org');
+set role authenticated;
 select t.expect_error($$select * from public.find_conference_account('ab')$$, 'live validation kept: find_conference_account rejects invalid email', 'P0001');
 reset role;
 
