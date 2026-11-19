@@ -32,7 +32,7 @@ export function Hero({status}: {status: PublicStatus}) {
       <div className="hero-visual">
         <span className="hero-badge">Fully sponsored · No fees</span>
         <figure className="hero-figure">
-          <Image src={HERO_IMAGE.src} alt={HERO_IMAGE.alt} fill priority sizes="(max-width: 960px) 92vw, 40vw" />
+          <Image src={HERO_IMAGE.src} alt={HERO_IMAGE.alt} fill priority sizes="(max-width: 960px) 92vw, 40vw" style={{objectPosition: HERO_IMAGE.position}} />
           <figcaption><strong>Biodiversity · Climate · Food</strong><span>{HERO_IMAGE.caption}</span></figcaption>
         </figure>
       </div>

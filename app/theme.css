@@ -363,6 +363,8 @@ details.plain-card > summary { cursor: pointer; }
 
 /* Institution logos */
 .inst-logo { display: block; object-fit: contain; }
+/* The supplied AvH logo has a white background; multiply lets it sit on the ivory surfaces without a visible box (colours unchanged on near-white). */
+.inst-logo[src$="avh-supported-by.png"] { mix-blend-mode: multiply; }
 .inst-logo-fallback { display: inline-flex; align-items: center; justify-content: center; padding: .4rem .7rem; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; font: 600 .85rem/1.2 var(--font-sans); color: var(--forest-800); text-align: center; }
 
 /* About */
