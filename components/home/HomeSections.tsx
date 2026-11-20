@@ -12,7 +12,7 @@ import type {PublicStatus} from '@/lib/public-settings';
 export function Hero({status}: {status: PublicStatus}) {
   return <section className="hero" aria-labelledby="hero-title">
     <div className="container hero-grid">
-      <div className="hero-copy">
+      <div className="hero-copy" style={{gridColumn: '1 / -1'}}>
         <p className="kicker">Humboldt Kolleg · Akure, Nigeria</p>
         <h1 id="hero-title">Biodiversity, Climate Change <em>and</em> Food&nbsp;Security</h1>
         <p className="hero-focus">{CONFERENCE.focus}.</p>
@@ -29,10 +29,10 @@ export function Hero({status}: {status: PublicStatus}) {
           <Link href="/programme" className="text-link">View the programme</Link>
         </div>
       </div>
-      <div className="hero-visual">
+      <div className="hero-visual" style={{gridColumn: '1 / -1', maxWidth: 'none'}}>
         <span className="hero-badge">Fully sponsored · No fees</span>
-        <figure className="hero-figure">
-          <Image src={HERO_IMAGE.src} alt={HERO_IMAGE.alt} fill priority sizes="(max-width: 960px) 92vw, 40vw" style={{objectPosition: HERO_IMAGE.position}} />
+        <figure className="hero-figure" style={{aspectRatio: 'auto', height: 'clamp(24rem, 50vw, 40rem)'}}>
+          <Image src={HERO_IMAGE.src} alt={HERO_IMAGE.alt} fill priority sizes="100vw" style={{objectPosition: HERO_IMAGE.position}} />
           <figcaption><strong>Biodiversity · Climate · Food</strong><span>{HERO_IMAGE.caption}</span></figcaption>
         </figure>
       </div>
@@ -78,6 +78,14 @@ export function Subthemes() {
       <div className="section-head">
         <div><p className="kicker kicker-light">Scientific programme</p><h2 id="themes-title">Scientific themes</h2></div>
         <p>{SUBTHEMES_INTRO}</p>
+      </div>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 22rem), 1fr))', gap: '1rem', marginBottom: '2rem'}}>
+        {[
+          {file: 'forest-canopy-stand', alt: 'Tall forest trees seen from beneath the canopy'},
+          {file: 'forest-buttress-tree', alt: 'Broad buttress roots spreading from the base of a tree'}
+        ].map(photo => <a key={photo.file} href={`/images/forest/${photo.file}.webp`} style={{position: 'relative', display: 'block', height: 'clamp(20rem, 35vw, 30rem)', overflow: 'hidden', borderRadius: 'var(--radius-lg)'}}>
+          <Image src={`/images/forest/${photo.file}.webp`} alt={photo.alt} fill sizes="(max-width: 760px) 100vw, 50vw" style={{objectFit: 'cover'}} />
+        </a>)}
       </div>
       <ol className="theme-list-home">
         {SUBTHEMES.map(t => <li key={t.no} className="theme-item">
