@@ -5,11 +5,11 @@ import {useEffect, useRef, useState} from 'react';
 import {NexusMark} from './NexusMark';
 
 const NAV = [
-  {href: '/#about', label: 'About'},
-  {href: '/#subthemes', label: 'Sub-themes'},
+  {href: '/about', label: 'About'},
+  {href: '/subthemes', label: 'Sub-themes'},
   {href: '/programme', label: 'Programme'},
   {href: '/speakers', label: 'Speakers'},
-  {href: '/#venue', label: 'Venue'},
+  {href: '/venue', label: 'Venue'},
   {href: '/abstracts', label: 'Abstract book'}
 ];
 

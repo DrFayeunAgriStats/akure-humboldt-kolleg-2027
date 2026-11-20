@@ -4,8 +4,7 @@
 export const CONFERENCE = {
   name: 'Akure Humboldt Kolleg 2027',
   shortName: 'Akure Humboldt Kolleg',
-  theme: 'Biodiversity, Climate Change and Food Security',
-  focus: 'The role of science, innovation and community engagement',
+  theme: 'Intersection of Biodiversity Conservation, Climate Change and Food Security: the role of science, innovation and community engagement',
   dates: '22–25 February 2027',
   datesLong: 'Monday 22 – Thursday 25 February 2027',
   venue: 'Federal University of Technology, Akure (FUTA)',
@@ -124,7 +123,6 @@ export const CONTACT = {
 export const HERO_IMAGE = {
   src: '/images/forest/forest-tall-trunks-climbers.webp',
   alt: 'Tall tropical forest trees covered in climbing plants above dense green undergrowth',
-  caption: 'Photo: Prof. Jonathan C. Onyekwelu, conference convener',
   // Keeps the large trunk on the right in the tall desktop crop; the wide mobile crop shows the full stand.
   position: '62% 50%'
 } as const;

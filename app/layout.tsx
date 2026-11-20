@@ -1,3 +1,4 @@
+import {CONFERENCE} from '@/lib/site-content';
 import './globals.css';
 import {Inter, Source_Serif_4} from 'next/font/google';
 import {ToastProvider} from '@/components/ToastProvider';
@@ -9,7 +10,7 @@ const sans = Inter({ subsets: ['latin'], variable: '--font-sans-face', display: 
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://akure-humboldt-kolleg-2027.vercel.app';
 const isPublic = process.env.SITE_PUBLIC === 'true';
-const title = 'Akure Humboldt Kolleg 2027 — Biodiversity, Climate Change and Food Security';
+const title = `${CONFERENCE.name} — ${CONFERENCE.theme}`;
 const description = 'A Humboldt Kolleg hosted by the Federal University of Technology, Akure (FUTA), 22–25 February 2027. Five scientific sub-themes. Free participation.';
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   openGraph: {
     title, description, type: 'website', siteName: 'Akure Humboldt Kolleg 2027', locale: 'en_NG',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Akure Humboldt Kolleg 2027: Biodiversity, Climate Change and Food Security' }]
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: `${CONFERENCE.name} — ${CONFERENCE.theme}` }]
   },
   twitter: { card: 'summary_large_image', title, description, images: ['/opengraph-image'] },
   robots: { index: isPublic, follow: isPublic }

@@ -14,12 +14,15 @@ export function SiteFooter() {
       <nav aria-label="Conference" className="footer-col">
         <h2>Conference</h2>
         <ul>
-          <li><Link href="/#about">About the Kolleg</Link></li>
-          <li><Link href="/#subthemes">Scientific sub-themes</Link></li>
+          <li><Link href="/about">About the Kolleg</Link></li>
+          <li><Link href="/subthemes">Scientific sub-themes</Link></li>
+          <li><Link href="/partners">Partners</Link></li>
+          <li><Link href="/participation">Participation</Link></li>
+          <li><Link href="/contact">Contact</Link></li>
           <li><Link href="/programme">Programme</Link></li>
           <li><Link href="/speakers">Speakers</Link></li>
           <li><Link href="/abstracts">Abstract book</Link></li>
-          <li><Link href="/#venue">Venue and travel</Link></li>
+          <li><Link href="/venue">Venue and travel</Link></li>
         </ul>
       </nav>
       <nav aria-label="Participate" className="footer-col">

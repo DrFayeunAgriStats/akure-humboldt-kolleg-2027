@@ -14,8 +14,7 @@ export function Hero({status}: {status: PublicStatus}) {
     <div className="container hero-grid">
       <div className="hero-copy" style={{gridColumn: '1 / -1'}}>
         <p className="kicker">Humboldt Kolleg · Akure, Nigeria</p>
-        <h1 id="hero-title">Biodiversity, Climate Change <em>and</em> Food&nbsp;Security</h1>
-        <p className="hero-focus">{CONFERENCE.focus}.</p>
+        <h1 id="hero-title">Theme: {CONFERENCE.theme}</h1>
         <ul className="hero-facts" aria-label="Key facts">
           <li><span className="fact-label">Dates</span><span className="fact-value">{CONFERENCE.dates}</span></li>
           <li><span className="fact-label">Venue</span><span className="fact-value">FUTA, Akure</span></li>
@@ -33,7 +32,7 @@ export function Hero({status}: {status: PublicStatus}) {
         <span className="hero-badge">Fully sponsored · No fees</span>
         <figure className="hero-figure" style={{aspectRatio: 'auto', height: 'clamp(24rem, 50vw, 40rem)'}}>
           <Image src={HERO_IMAGE.src} alt={HERO_IMAGE.alt} fill priority sizes="100vw" style={{objectPosition: HERO_IMAGE.position}} />
-          <figcaption><strong>Biodiversity · Climate · Food</strong><span>{HERO_IMAGE.caption}</span></figcaption>
+          <figcaption><strong>Biodiversity · Climate · Food</strong></figcaption>
         </figure>
       </div>
     </div>
