@@ -35,7 +35,7 @@ Under Authentication → URL Configuration:
 
 ## Acceptance testing
 
-1. Check mobile and desktop public homepage, five tracks, dates, location and the two rainforest images.
+1. Check mobile and desktop public homepage, five tracks, dates, location and the convener's forest photograph in the hero.
 2. Login by magic link with an intentionally created test email; check the browser returns to `/dashboard`.
 3. For controlled staging tests, enable registration in the **preview environment only**, then verify the first free registration produces a real `AKH-2027-...` reference and is visible only to its owner.
 4. Repeat with a second independent test participant and verify cross-user isolation.

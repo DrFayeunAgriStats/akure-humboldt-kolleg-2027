@@ -88,7 +88,7 @@ export const VENUE = {
 } as const;
 
 // Approved institutional identities (see ASSET_SOURCES.md). Logos are self-hosted copies of
-// the approved files (AvH SVG byte-identical; FUTA crest resized only); a text fallback remains.
+// the approved files (AvH "supported by" logo supplied by the organisers; FUTA crest resized only); a text fallback remains.
 export const INSTITUTIONS = {
   host: {
     role: 'Host institution',
@@ -104,9 +104,9 @@ export const INSTITUTIONS = {
     name: 'Alexander von Humboldt Foundation',
     short: 'AvH',
     url: 'https://www.humboldt-foundation.de/en/',
-    logo: '/branding/avh-logo-rgb.svg',
-    logoAlt: 'Alexander von Humboldt Foundation logo',
-    logoWidth: 170, logoHeight: 80
+    logo: '/branding/avh-supported-by.png',
+    logoAlt: 'Supported by the Alexander von Humboldt Foundation (Alexander von Humboldt Stiftung) logo',
+    logoWidth: 534, logoHeight: 240
   }
 } as const;
 
@@ -122,7 +122,9 @@ export const CONTACT = {
 } as const;
 
 export const HERO_IMAGE = {
-  src: '/assets/nigerian-rainforest-hero.webp',
-  alt: 'Lush green tropical forest landscape',
-  caption: 'Conceptual artwork: tropical forest landscape'
+  src: '/images/forest/forest-tall-trunks-climbers.webp',
+  alt: 'Tall tropical forest trees covered in climbing plants above dense green undergrowth',
+  caption: 'Photo: Prof. Jonathan C. Onyekwelu, conference convener',
+  // Keeps the large trunk on the right in the tall desktop crop; the wide mobile crop shows the full stand.
+  position: '62% 50%'
 } as const;
