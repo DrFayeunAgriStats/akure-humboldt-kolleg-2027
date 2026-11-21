@@ -168,7 +168,6 @@ export function Venue() {
         </div>
         <figure className="venue-photo">
           <VenuePhoto src={VENUE.photo.src} alt={VENUE.photo.alt} />
-          <figcaption>New FUTA main entrance · {VENUE.photo.credit}</figcaption>
         </figure>
       </div>
       <div className="venue-landmark">
@@ -181,7 +180,6 @@ export function Venue() {
           <p className="kicker">FUTA campus landmark</p>
           <h3>The university monument</h3>
           <p>A familiar expression of FUTA's identity, featuring its crest and the motto “Technology for Self Reliance.”</p>
-          <p className="muted">{VENUE.monument.credit}. Select the photograph to view the original.</p>
         </div>
       </div>
       <div className="map-block">
