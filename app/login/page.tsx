@@ -9,20 +9,12 @@ export const metadata = {
   robots: {index: false, follow: false}
 };
 
-const ERRORS: Record<string, string> = {
-  expired: 'That sign-in link has expired or has already been used. Links work once and expire after a short time. Request a new link below.',
-  invalid: 'That sign-in link is incomplete or invalid. Please request a new link below, and open it in the same browser where you requested it.',
-  auth: 'We could not complete your sign-in. Request a new link below and open it in the same browser. If this keeps happening, contact the organisers.',
-  config: 'Sign-in is temporarily unavailable. Please try again later.'
-};
-
-export default async function Page({searchParams}: {searchParams: Promise<{error?: string; next?: string}>}) {
-  const {error, next} = await searchParams;
-  const message = error ? ERRORS[error] || ERRORS.auth : null;
-  return <Shell title="Sign in" kicker="Participants, reviewers and organisers" intro="We email you a one-time sign-in link. No password is needed.">
-    {message && <div className="message error" role="alert"><strong>Sign-in link problem.</strong> {message}</div>}
-    <p>Enter your email address and we will send you a one-time sign-in link. No password is needed.
-      Reviewer and organiser access is assigned by the organising committee.</p>
-    <LoginForm next={safeNext(next)} />
+export default async function Page({searchParams}: {searchParams: Promise<{error?: string; next?: string; mode?: string}>}) {
+  const {error, next, mode} = await searchParams;
+  const action = mode === 'create' || mode === 'recover' ? mode : 'login';
+  const title = {login: 'Sign in', create: 'Create a portal account', recover: 'Set or reset your password'}[action];
+  return <Shell title={title} kicker="Conference portal">
+    {error && <p className="message error" role="alert">The email link could not be verified. Request a new password setup link and open it in the same browser.</p>}
+    <LoginForm key={action} mode={action} next={safeNext(next)} />
   </Shell>;
 }

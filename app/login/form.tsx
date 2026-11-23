@@ -1,53 +1,65 @@
 'use client';
+import Link from 'next/link';
 import {FormEvent, useState} from 'react';
 import {createBrowserClient} from '@supabase/ssr';
 import {SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_KEY} from '@/lib/supabase/public-config';
 import {NEXT_COOKIE} from '@/lib/redirect';
 
-function friendly(message: string) {
-  if (/rate limit|only request this after|too many/i.test(message))
-    return 'A sign-in link was requested very recently. Please wait a minute, then try again.';
-  if (/invalid.*email|email.*invalid/i.test(message)) return 'Please enter a valid email address.';
-  if (/fetch|network/i.test(message)) return 'We could not reach the sign-in service. Check your connection and try again.';
-  return message || 'Sign-in failed. Please try again.';
-}
+type Mode = 'login' | 'create' | 'recover' | 'set';
+const labels = {login: 'Sign in', create: 'Create account', recover: 'Send password setup link', set: 'Save password'};
 
-export function LoginForm({next}: {next: string}) {
-  const [email, setEmail] = useState('');
-  const [sentTo, setSentTo] = useState('');
+export function LoginForm({next, mode}: {next: string; mode: Mode}) {
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
-
-  async function submit(e: FormEvent) {
+  const destination = encodeURIComponent(next);
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setBusy(true); setError('');
+    const fields = new FormData(e.currentTarget);
+    const email = String(fields.get('email') || '').trim();
+    const password = String(fields.get('password') || '');
+    setBusy(true); setError(''); setNotice('');
     try {
       if (!SUPABASE_PUBLIC_URL || !SUPABASE_PUBLIC_KEY) throw new Error('Sign-in is temporarily unavailable.');
-      // Remember the destination in a cookie rather than the redirect URL, so the
-      // Supabase redirect allow-list only ever needs the plain /auth/callback URL.
-      document.cookie = `${NEXT_COOKIE}=${encodeURIComponent(next)}; path=/; max-age=1800; samesite=lax${location.protocol === 'https:' ? '; secure' : ''}`;
-      const client = createBrowserClient(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_KEY);
-      const {error} = await client.auth.signInWithOtp({email: email.trim(), options: {emailRedirectTo: location.origin + '/auth/callback'}});
-      if (error) throw error;
-      setSentTo(email.trim());
+      const {auth} = createBrowserClient(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_KEY);
+      if (mode === 'login' || mode === 'set') {
+        const result = mode === 'login' ? await auth.signInWithPassword({email, password}) : await auth.updateUser({password});
+        if (result.error) throw result.error;
+      } else {
+        const callback = location.origin + '/auth/callback';
+        const target = mode === 'recover' ? '/set-password?next=' + destination : next;
+        document.cookie = NEXT_COOKIE + '=' + encodeURIComponent(target) + '; path=/; max-age=3600; samesite=lax' + (location.protocol === 'https:' ? '; secure' : '');
+        if (mode === 'recover') {
+          const {error} = await auth.resetPasswordForEmail(email, {redirectTo: callback});
+          if (error) throw error;
+          setNotice('If this address has an account, open the password setup email in this browser.');
+          return;
+        }
+        const {data, error} = await auth.signUp({email, password, options: {emailRedirectTo: callback}});
+        if (error) throw error;
+        if (!data.session) {
+          setNotice('Check your inbox to confirm your new account. If you already have an account, sign in or reset your password.');
+          return;
+        }
+      }
+      window.location.assign(next);
     } catch (err) {
-      const msg = friendly(err instanceof Error ? err.message : '');
-      setError(msg);
+      setError(err instanceof Error ? err.message : 'Unable to complete this request. Please try again.');
     } finally { setBusy(false); }
   }
-
-  if (sentTo) return <div className="message success" role="status">
-    <strong>Check your inbox.</strong> We sent a sign-in link to <strong>{sentTo}</strong>. Open it in this browser to continue.
-    It can take a minute to arrive. Check your spam folder too.
-    <p><button type="button" className="app-btn-link" onClick={() => setSentTo('')}>Use a different email address</button></p>
-  </div>;
-
-  return <form className="app-form" onSubmit={submit} noValidate={false}>
-    <label>Email address
-      <input type="email" required value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" inputMode="email"
-        aria-invalid={error ? true : undefined} aria-describedby={error ? 'login-error' : undefined} />
-    </label>
-    <button disabled={busy}>{busy ? 'Sending…' : 'Email me a sign-in link'}</button>
-    {error && <div id="login-error" role="alert" className="message error">{error}</div>}
-  </form>;
+  return <>
+    <form className="app-form" onSubmit={submit}>
+      {mode !== 'set' && <label>Email address<input required name="email" type="email" autoComplete="username" /></label>}
+      {mode !== 'recover' && <label>{mode === 'login' ? 'Password' : 'New password'}
+        <input required name="password" type="password" minLength={mode === 'login' ? undefined : 8}
+          autoComplete={mode === 'login' ? 'current-password' : 'new-password'} /></label>}
+      <button disabled={busy}>{busy ? 'Please wait…' : labels[mode]}</button>
+      {error && <p role="alert" className="message error">{error}</p>}
+      {notice && <p role="status" className="message success">{notice}</p>}
+    </form>
+    {mode === 'login' ? <>
+      <p><Link href={'/login?mode=recover&next=' + destination}>Set or reset your password</Link></p>
+      <p><Link href={'/login?mode=create&next=' + destination}>Create a portal account</Link></p>
+    </> : <p><Link href={'/login?next=' + destination}>Back to sign in</Link></p>}
+  </>;
 }

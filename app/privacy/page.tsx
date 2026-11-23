@@ -20,7 +20,7 @@ export default function Page() {
 
       <h2>What we collect</h2>
       <ul>
-        <li><strong>Sign-in:</strong> your email address, used to send one-time sign-in links.</li>
+        <li><strong>Sign-in:</strong> your email address identifies your account. You sign in with a password.</li>
         <li><strong>Registration:</strong> name, institution, country, delegate category and your answers about Humboldt status and participation. City and phone number are optional.</li>
         <li><strong>Abstracts:</strong> title, authors, institution, abstract text, keywords, presentation preference and any attachment you upload.</li>
         <li><strong>Peer review:</strong> reviewers' scores and comments on the abstracts assigned to them.</li>

@@ -50,7 +50,7 @@ export default async function Page() {
         ? <div className="plain-card cta-card">
             <h2>Before you submit</h2>
             <ol className="step-list">
-              <li>Sign in with a one-time email link.</li>
+              <li>Sign in with your email and password.</li>
               <li>Register for the Kolleg (free, about 2 minutes).</li>
               <li>Submit your abstract and track its review in your portal.</li>
             </ol>
