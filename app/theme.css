@@ -462,6 +462,17 @@ details.plain-card > summary { cursor: pointer; }
 .contact-band { background: var(--forest-800); color: #dfe9e2; }
 .contact-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
 .contact-band h2 { color: #fff; }
+.contact-band a[href="mailto:secretariat@futahumboldtkolleg.org"] {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: .18em;
+  overflow-wrap: anywhere;
+}
+.contact-band a[href="mailto:secretariat@futahumboldtkolleg.org"]:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
 .contact-band p { color: #cad9cf; }
 .contact-card { background: var(--paper); color: var(--ink); border-radius: var(--radius-lg); padding: clamp(1.5rem, 3.5vw, 2rem); }
 .contact-card h3 { font-size: 1.45rem; margin-bottom: .35rem; }
