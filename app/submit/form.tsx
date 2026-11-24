@@ -11,15 +11,18 @@ export function AbstractForm() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const words = countWords(body);
-  const withinLimit = words >= 250 && words <= 300;
+  const withinLimit = words > 0 && words <= 300;
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!withinLimit) {
-      const msg = `Your abstract must be 250–300 words. It currently has ${words}.`;
+    const file = (e.currentTarget.elements.namedItem('file') as HTMLInputElement | null)?.files?.[0];
+    if (!words && !file?.size) {
+      setError('Enter abstract text or upload an abstract file.'); return;
+    }
+    if (words > 300) {
+      const msg = `Your abstract must not exceed 300 words. It currently has ${words}.`;
       setError(msg); return;
     }
-    const file = (e.currentTarget.elements.namedItem('file') as HTMLInputElement | null)?.files?.[0];
     if (file && file.size > 2 * 1024 * 1024) {
       const msg = 'The attachment is larger than 2 MB.'; setError(msg); return;
     }
@@ -58,12 +61,13 @@ export function AbstractForm() {
       <label>Co-authors <span className="optional">(optional, separate with semicolons)</span><input name="co_authors" maxLength={500} /></label>
     </fieldset>
     <fieldset>
-      <legend>Abstract text</legend>
-      <label>Abstract (250–300 words)
-        <textarea required name="body" rows={12} value={body} onChange={e => setBody(e.target.value)} aria-describedby="word-count" />
+      <legend>Abstract</legend>
+      <p className="field-help">Enter your abstract below, upload a file, or do both. The abstract must not exceed 300 words.</p>
+      <label>Abstract text (up to 300 words)
+        <textarea name="body" rows={12} maxLength={5000} value={body} onChange={e => setBody(e.target.value)} aria-describedby="word-count" />
       </label>
       <p id="word-count" aria-live="polite" className={'word-count ' + (withinLimit ? 'is-ok' : words > 300 ? 'is-over' : '')}>
-        <strong>{words}</strong> / 250–300 words · {words < 250 ? `${250 - words} more needed` : words > 300 ? `${words - 300} over the limit` : 'within the limit'}
+        <strong>{words}</strong> / 300 words · {words === 0 ? 'Upload a file if leaving this blank' : words > 300 ? `${words - 300} over the limit` : 'within the limit'}
       </p>
       <label>Attachment <span className="optional">(optional · PDF, DOC or DOCX · max 2 MB)</span><input name="file" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /></label>
     </fieldset>

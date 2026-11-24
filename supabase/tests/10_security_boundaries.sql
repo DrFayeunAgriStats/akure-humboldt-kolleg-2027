@@ -67,8 +67,20 @@ reset role;
 update public.conference_settings set submissions_open = true where id = 1;
 set role authenticated;
 select t.expect_error($$insert into public.abstracts(registration_id,user_id,author_name,email,institution,title,body,track,presentation_type,is_demo)
-  select r.id, r.user_id, 'Ada Author', r.email, 'FUTA', 'Soil carbon in agroforests', 'too short', 1, 'oral', true from public.registrations r$$,
-  'abstract under 250 words rejected by constraint', '23514');
+  select r.id, r.user_id, 'Ada Author', r.email, 'FUTA', 'Soil carbon in agroforests', ' ', 1, 'oral', true from public.registrations r$$,
+  'abstract without text or attachment rejected', '23514');
+select t.expect_error($$insert into public.abstracts(registration_id,user_id,author_name,email,institution,title,body,track,presentation_type,is_demo)
+  select r.id, r.user_id, 'Ada Author', r.email, 'FUTA', 'Soil carbon in agroforests', repeat('word ', 301), 1, 'oral', true from public.registrations r$$,
+  'abstract over 300 words rejected', '23514');
+begin;
+insert into public.abstracts(registration_id,user_id,author_name,email,institution,title,body,track,presentation_type,is_demo)
+  select r.id, r.user_id, 'Ada Author', r.email, 'FUTA', 'Soil carbon in agroforests', 'Short abstract', 1, 'oral', true from public.registrations r;
+select t.ok(true, 'abstract under 250 words accepted');
+insert into storage.objects(bucket_id,name) values ('abstract-files','00000000-0000-0000-0000-00000000000b/file-only.pdf');
+insert into public.abstracts(registration_id,user_id,author_name,email,institution,title,body,track,presentation_type,is_demo,file_path)
+  select r.id, r.user_id, 'Ada Author', r.email, 'FUTA', 'File-only abstract', '', 1, 'oral', true, '00000000-0000-0000-0000-00000000000b/file-only.pdf' from public.registrations r;
+select t.ok(true, 'file-only abstract accepted');
+rollback;
 insert into public.abstracts(registration_id,user_id,author_name,email,institution,title,body,track,presentation_type,is_demo)
   select r.id, r.user_id, 'Ada Author', r.email, 'FUTA', 'Soil carbon in agroforests', (select body from words), 1, 'oral', true from public.registrations r;
 select t.ok(true, 'abstract accepted while submissions open');

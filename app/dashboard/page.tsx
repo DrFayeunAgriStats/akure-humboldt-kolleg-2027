@@ -52,7 +52,7 @@ export default async function Page() {
       <section className="plain-card" aria-labelledby="card-abs">
         <span className="eyebrow-small">ABSTRACTS</span>
         <h2 id="card-abs">{subs?.length || 0} submitted</h2>
-        <p>Abstracts of 250–300 words under one of the five sub-themes.</p>
+        <p>Abstracts of up to 300 words under one of the five sub-themes.</p>
         <Link href="/submit">{reg ? 'Submit an abstract' : 'Call for abstracts'}</Link>
       </section>
       <section className="plain-card" aria-labelledby="card-fee">

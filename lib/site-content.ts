@@ -63,7 +63,7 @@ export const PROGRAMME = {
 
 export const PARTICIPATION_STEPS = [
   {title: 'Register', text: 'Participant details and institutional affiliation'},
-  {title: 'Submit an abstract', text: '250–300 words under one of the five sub-themes'},
+  {title: 'Submit an abstract', text: 'Up to 300 words under one of the five sub-themes'},
   {title: 'Track your submission', text: 'Review updates through a private author portal'}
 ] as const;
 
