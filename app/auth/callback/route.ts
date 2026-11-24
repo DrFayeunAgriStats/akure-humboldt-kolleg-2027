@@ -17,9 +17,17 @@ export async function GET(req: NextRequest) {
   if (!hasConfig()) return toLogin(req, 'config');
   if (!code) return toLogin(req, 'invalid');
   const db = await getSupabaseServer();
-  const {error} = await db.auth.exchangeCodeForSession(code);
+  const flowId = url.searchParams.get('sb_flow_id');
+  const {data, error} = await db.auth.exchangeCodeForSession(code, flowId ? {flowId} : undefined);
   if (error) return toLogin(req, /expired|already/i.test(error.message) ? 'expired' : 'auth');
-  const res = NextResponse.redirect(new URL(safeNext(req.cookies.get(NEXT_COOKIE)?.value), req.url));
+  const destination = safeNext(req.cookies.get(NEXT_COOKIE)?.value);
+  // The PKCE exchange identifies recovery independently of the optional
+  // navigation cookie, which may be missing when an email link is opened.
+  const recovery = 'redirectType' in data && data.redirectType === 'recovery';
+  const target = recovery && !destination.startsWith('/set-password?')
+    ? '/set-password?next=' + encodeURIComponent(destination)
+    : destination;
+  const res = NextResponse.redirect(new URL(target, req.url));
   res.cookies.delete(NEXT_COOKIE);
   return res;
 }

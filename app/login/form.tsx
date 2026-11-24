@@ -18,6 +18,10 @@ export function LoginForm({next, mode}: {next: string; mode: Mode}) {
     const fields = new FormData(e.currentTarget);
     const email = String(fields.get('email') || '').trim();
     const password = String(fields.get('password') || '');
+    if (mode === 'set' && password !== String(fields.get('confirm_password') || '')) {
+      setError('The passwords do not match.');
+      return;
+    }
     setBusy(true); setError(''); setNotice('');
     try {
       if (!SUPABASE_PUBLIC_URL || !SUPABASE_PUBLIC_KEY) throw new Error('Sign-in is temporarily unavailable.');
@@ -25,6 +29,12 @@ export function LoginForm({next, mode}: {next: string; mode: Mode}) {
       if (mode === 'login' || mode === 'set') {
         const result = mode === 'login' ? await auth.signInWithPassword({email, password}) : await auth.updateUser({password});
         if (result.error) throw result.error;
+        if (mode === 'set') {
+          const {error} = await auth.signOut({scope: 'local'});
+          if (error) throw error;
+          window.location.assign('/login?password=updated&next=' + destination);
+          return;
+        }
       } else {
         const callback = location.origin + '/auth/callback';
         const target = mode === 'recover' ? '/set-password?next=' + destination : next;
@@ -53,6 +63,8 @@ export function LoginForm({next, mode}: {next: string; mode: Mode}) {
       {mode !== 'recover' && <label>{mode === 'login' ? 'Password' : 'New password'}
         <input required name="password" type="password" minLength={mode === 'login' ? undefined : 8}
           autoComplete={mode === 'login' ? 'current-password' : 'new-password'} /></label>}
+      {mode === 'set' && <label>Confirm new password
+        <input required name="confirm_password" type="password" minLength={8} autoComplete="new-password" /></label>}
       <button disabled={busy}>{busy ? 'Please wait…' : labels[mode]}</button>
       {error && <p role="alert" className="message error">{error}</p>}
       {notice && <p role="status" className="message success">{notice}</p>}
