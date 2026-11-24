@@ -220,15 +220,15 @@ export function Contact() {
     <div className="container contact-grid">
       <div>
         <p className="kicker kicker-light">Conference contact</p>
-        <h2 id="contact-title">Contact the convener</h2>
+        <h2 id="contact-title">Contact the conference secretariat</h2>
         <p>{CONTACT.intro}</p>
+        <p><a href={`mailto:${CONTACT.secretariatEmail}`}>{CONTACT.secretariatEmail}</a></p>
       </div>
       <div className="contact-card">
         <p className="eyebrow-small">{CONTACT.role}</p>
         <h3>{CONTACT.name}</h3>
         <p>{CONTACT.department}<br />{CONTACT.institution}</p>
-        <p className="contact-email">Conference enquiries: <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></p>
-        <p className="contact-fine">{CONTACT.note}</p>
+        <p className="contact-email"><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></p>
         <a className="btn btn-secondary" href={CONTACT.profile} target="_blank" rel="noopener noreferrer">Official FUTA staff profile<span className="sr-only"> (opens in a new tab)</span></a>
       </div>
     </div>

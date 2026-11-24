@@ -110,14 +110,14 @@ export const INSTITUTIONS = {
 } as const;
 
 export const CONTACT = {
-  intro: 'Enquiries about Akure Humboldt Kolleg 2027 may be addressed to the conference convener.',
+  intro: 'For questions about registration, abstracts or the programme, email the conference secretariat.',
   name: 'Prof. Jonathan C. Onyekwelu',
   role: 'Conference convener',
   department: 'Department of Forestry and Wood Technology (FWT)',
   institution: 'Federal University of Technology, Akure, Nigeria',
   email: 'jconyekwelu@futa.edu.ng',
   profile: 'https://fwt.futa.edu.ng/home/profile/938',
-  note: 'Current conference enquiry email supplied by the organising team; the contact may be updated when a dedicated secretariat mailbox is established.'
+  secretariatEmail: 'secretariat@futahumboldtkolleg.org'
 } as const;
 
 export const HERO_IMAGE = {

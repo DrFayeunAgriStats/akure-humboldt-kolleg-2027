@@ -36,6 +36,7 @@ export function SiteFooter() {
       </nav>
       <div className="footer-col">
         <h2>Contact</h2>
+        <p>Conference secretariat<br /><a href={`mailto:${CONTACT.secretariatEmail}`}>{CONTACT.secretariatEmail}</a></p>
         <p>{CONTACT.name}<br />{CONTACT.role}</p>
         <p><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></p>
       </div>
