@@ -2,7 +2,7 @@ import Link from 'next/link';
 import {Shell, TestModeNotice} from '@/components/Shell';
 import {AbstractForm} from './form';
 import {currentUser, getSupabaseServer} from '@/lib/supabase/server';
-import {getConferenceSettings, submissionState, formatDeadline} from '@/lib/conference-mode';
+import {participantTestMode, getConferenceSettings, submissionState, formatDeadline} from '@/lib/conference-mode';
 import {THEMES} from '@/lib/themes';
 
 export const metadata = {
@@ -14,17 +14,18 @@ export const dynamic = 'force-dynamic';
 
 export default async function Page() {
   const settings = await getConferenceSettings();
+  const testing = await participantTestMode(settings);
   const state = submissionState(settings);
   const user = await currentUser();
   let registered = false;
   if (user) {
     const db = await getSupabaseServer();
-    const r = await db.from('registrations').select('id').eq('user_id', user.id).eq('is_demo', settings.demo_mode).maybeSingle();
+    const r = await db.from('registrations').select('id').eq('user_id', user.id).eq('is_demo', testing).maybeSingle();
     registered = Boolean(r.data);
   }
 
   return <Shell title="Call for abstracts" kicker="Five sub-themes · Up to 300 words" intro="Share research on biodiversity, climate change and food security under one of the five scientific sub-themes."
-    notice={<TestModeNotice show={settings.demo_mode && state === 'open'} />}>
+    notice={<TestModeNotice show={testing && state === 'open'} />}>
     <div className="guidelines">
       <p className="lead-copy">Submit research under one of the five sub-themes. Submission is free; abstracts stay private unless accepted and released by the scientific committee.</p>
       <details className="plain-card">
@@ -32,6 +33,7 @@ export default async function Page() {
         <ol className="theme-list">{THEMES.map((t, i) => <li key={i}>{t}</li>)}</ol>
         <ul>
           <li>Length: up to 300 words. Enter text or upload an abstract document.</li>
+          <li>Keywords are required. Separate them with commas.</li>
           <li>Presenting author must be registered for the Kolleg.</li>
           <li>Attachment: PDF, DOC or DOCX, up to 2 MB, visible only to organisers and assigned reviewers.</li>
           <li>Indicate your preference for an oral or poster presentation.</li>

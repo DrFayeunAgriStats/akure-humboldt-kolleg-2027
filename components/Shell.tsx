@@ -42,8 +42,8 @@ export function Shell({title, kicker, intro, notice, wide, children}: {
 export function TestModeNotice({show}: {show: boolean}) {
   if (!show) return null;
   return <div className="notice notice-info" role="note">
-    <p className="notice-title">Official registration has not opened yet</p>
+    <p className="notice-title">Test entry mode</p>
     <p>Entries made now are stored as pre-launch test records. They are not official registrations or submissions and do not carry over automatically.
-      Please do not upload unpublished research. See the <Link href="/privacy">privacy notice</Link>.</p>
+      Return to <Link href="/loc-test">LOC testing settings</Link> to leave browser testing. Please use fictitious submissions. See the <Link href="/privacy">privacy notice</Link>.</p>
   </div>;
 }

@@ -49,7 +49,7 @@ export default async function Page(){
         <h2>{(abs.data||[]).filter(x=>x.status==='submitted'||x.status==='under_review').length}</h2>
         <p className="help">Among latest 100 abstracts</p></div>
     </div>
-    <p className="help">Review decisions are based on saved assessments. CSV exports include all stored records.</p>
+    <p className="help">Review decisions are based on saved assessments. CSV exports include official records only. <Link href="/loc-test">Enter LOC testing</Link> to create test registrations and abstracts.</p>
     <div className="plain-card">
       <h3>Conference content administration</h3>
       <p>Organisers can manage the public programme and speakers without developer access.</p>

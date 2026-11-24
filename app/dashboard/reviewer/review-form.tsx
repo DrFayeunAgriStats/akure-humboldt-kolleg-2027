@@ -23,12 +23,14 @@ export function ReviewForm({assignmentId,initialReview}:{assignmentId:string;ini
     <p className="help">Score each criterion from 1 (poor) to 5 (excellent). Your recommendation is advisory; the organiser makes the decision.</p>
     {(['relevance','rigour','clarity','impact'] as const).map(field=><label key={field}>
       {field[0].toUpperCase()+field.slice(1)}
-      <select name={field} defaultValue={initialReview?.[field]??3}>
+      <select name={field} required defaultValue={initialReview?.[field]??''}>
+        <option value="" disabled>Select score</option>
         {[1,2,3,4,5].map(n=><option key={n} value={n}>{n} / 5</option>)}
       </select>
     </label>)}
     <label>Recommendation
-      <select name="recommendation" defaultValue={initialReview?.recommendation||'revise'}>
+      <select name="recommendation" required defaultValue={initialReview?.recommendation||''}>
+        <option value="" disabled>Select recommendation</option>
         <option value="accept">Recommend acceptance</option>
         <option value="revise">Recommend revision</option>
         <option value="reject">Recommend rejection</option>

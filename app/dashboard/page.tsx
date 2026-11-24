@@ -2,7 +2,7 @@ import Link from 'next/link';
 import {Shell, TestModeNotice} from '@/components/Shell';
 import {getSupabaseServer, hasConfig} from '@/lib/supabase/server';
 import {SignOut} from './sign-out';
-import {getConferenceSettings, registrationReference, abstractReference} from '@/lib/conference-mode';
+import {participantTestMode, getConferenceSettings, registrationReference, abstractReference} from '@/lib/conference-mode';
 import {STATUS_LABEL} from '@/lib/labels';
 
 export const metadata = {
@@ -26,15 +26,16 @@ export default async function Page() {
   </Shell>;
 
   const settings = await getConferenceSettings();
+  const testing = await participantTestMode(settings);
   const [{data: reg}, {data: subs}, {data: roles}] = await Promise.all([
-    db.from('registrations').select('serial_number,full_name,is_demo').eq('user_id', user.id).eq('is_demo', settings.demo_mode).maybeSingle(),
+    db.from('registrations').select('serial_number,full_name,is_demo').eq('user_id', user.id).eq('is_demo', testing).maybeSingle(),
     db.from('abstracts').select('id,serial_number,title,track,status,is_demo').eq('user_id', user.id).order('created_at', {ascending: false}),
     db.from('user_roles').select('role').eq('user_id', user.id)
   ]);
   const isOrganiser = roles?.some(x => x.role === 'organiser');
   const isReviewer = roles?.some(x => x.role === 'reviewer');
 
-  return <Shell title="My portal" kicker="Private account" intro="Your registration, abstracts and their review status in one place." wide notice={<TestModeNotice show={settings.demo_mode} />}>
+  return <Shell title="My portal" kicker="Private account" intro="Your registration, abstracts and their review status in one place." wide notice={<TestModeNotice show={testing} />}>
     <div className="app-topbar"><span>Signed in as <strong>{user.email}</strong></span><SignOut /></div>
 
     {(isOrganiser || isReviewer) && <nav className="staff-links" aria-label="Staff workspaces">

@@ -1,3 +1,4 @@
+import {cookies} from 'next/headers';
 import {cache} from 'react';
 import {getSupabaseServer, hasConfig} from '@/lib/supabase/server';
 
@@ -49,6 +50,12 @@ export const getConferenceSettings = cache(async (): Promise<ConferenceSettings>
     return FAIL_CLOSED;
   }
 });
+
+export const LOC_TEST_COOKIE = 'akh_loc_test';
+
+export async function participantTestMode(settings: ConferenceSettings) {
+  return settings.demo_mode || (await cookies()).get(LOC_TEST_COOKIE)?.value === '1';
+}
 
 export type GateState = 'open' | 'closed' | 'deadline-passed' | 'unavailable';
 

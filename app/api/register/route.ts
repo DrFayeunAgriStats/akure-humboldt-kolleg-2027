@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {authorized, error, validText, emailSend} from '@/lib/api';
 import {getSupabaseServer} from '@/lib/supabase/server';
-import {getConferenceSettings, registrationState, registrationReference} from '@/lib/conference-mode';
+import {participantTestMode, getConferenceSettings, registrationState, registrationReference} from '@/lib/conference-mode';
 
 const CLOSED_MESSAGE = {
   closed: 'Registration is not open yet.',
@@ -11,6 +11,7 @@ const CLOSED_MESSAGE = {
 
 export async function POST(req: NextRequest) {
   const settings = await getConferenceSettings();
+  const testing = await participantTestMode(settings);
   const state = registrationState(settings);
   if (state !== 'open') return error(CLOSED_MESSAGE[state], state === 'unavailable' ? 503 : 403);
 
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
   if (!['student', 'academic', 'professional', 'other'].includes(String(d.category))) return error('Please choose a delegate category.');
 
   const optional = (v: unknown, max: number) => typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null;
-  const isTest = settings.demo_mode;
+  const isTest = testing;
   const db = await getSupabaseServer();
   const r = await db.from('registrations').insert({
     user_id: user.id,

@@ -40,7 +40,7 @@ export default function Page() {
       <p>We use photographs or video of you in conference communications only if you give separate, optional consent when registering.</p>
 
       <h2>Pre-launch test records</h2>
-      <p>Before official registration opens, the participant system may be tested. Entries made during testing are
+      <p>Use the LOC testing page before entering fictitious participant details. Entries made in test mode are
         stored as test records. They are not official registrations or submissions, do not reserve a place and are
         handled separately from official records. Ask the convener if you want a test record removed.</p>
 

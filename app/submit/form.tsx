@@ -19,6 +19,10 @@ export function AbstractForm() {
     if (!words && !file?.size) {
       setError('Enter abstract text or upload an abstract file.'); return;
     }
+    const keywords = String(new FormData(e.currentTarget).get('keywords') || '').trim();
+    if (keywords.length < 2 || !keywords.split(',').some(word => word.trim())) {
+      setError('Enter at least one keyword (at least two characters in total).'); return;
+    }
     if (words > 300) {
       const msg = `Your abstract must not exceed 300 words. It currently has ${words}.`;
       setError(msg); return;
@@ -52,7 +56,7 @@ export function AbstractForm() {
       <label>Title<input name="title" required minLength={8} maxLength={250} /></label>
       <label>Sub-theme<select name="track" required defaultValue=""><option value="" disabled>Choose a sub-theme</option>{THEMES.map((t, i) => <option key={i} value={i + 1}>{i + 1}. {t}</option>)}</select></label>
       <label>Presentation preference<select name="presentation_type" required defaultValue="oral"><option value="oral">Oral presentation</option><option value="poster">Poster</option></select></label>
-      <label>Keywords <span className="optional">(comma-separated)</span><input name="keywords" required maxLength={250} placeholder="e.g. agroforestry, soil carbon, resilience" /></label>
+      <label>Keywords <span className="optional">(required, comma-separated)</span><input name="keywords" maxLength={250} placeholder="e.g. agroforestry, soil carbon, resilience" /></label>
     </fieldset>
     <fieldset>
       <legend>Authors</legend>

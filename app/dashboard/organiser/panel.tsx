@@ -105,29 +105,29 @@ export function OrganiserPanel({registrations,abstracts,reports,assignmentCounts
       <h3>Review reports & committee decisions</h3>
       <p className="help">The committee can inspect saved reviewer scores and comments. A scientific acceptance or rejection requires at least one completed review. Test records cannot be released publicly.</p>
       {feedback&&<div role="status" className="message">{feedback}</div>}
-      <div className="app-table-scroll" role="region" aria-label="Abstract decisions table" tabIndex={0}><table className="styled-table">
+      <div className="app-table-scroll" role="region" aria-label="Abstract decisions table" tabIndex={0}><table className="styled-table decision-table">
         <thead><tr><th>Reference & author</th><th>Track</th><th>Peer-review evidence</th><th>Committee decision</th><th>Assign reviewer</th><th>Public release</th></tr></thead>
         <tbody>{papers.map(a=>{
           const myReports=reportMap.get(a.id)||[];
           const assigned=assignedMap.get(a.id)||0;
           const ref=abstractReference(a.serial_number,a.is_demo);
           return <tr key={a.id}>
-            <td><strong>{ref}</strong><p>{a.title}</p><p className="help">{a.author_name} · {a.institution}</p></td>
-            <td>{a.track}</td>
-            <td><strong>{myReports.length} completed / {assigned} assigned</strong>
+            <td data-label="Reference and author"><strong>{ref}</strong><p>{a.title}</p><p className="help">{a.author_name} · {a.institution}</p></td>
+            <td data-label="Track">{a.track}</td>
+            <td data-label="Peer-review evidence"><strong>{myReports.length} completed / {assigned} assigned</strong>
               {myReports.length?myReports.map((r,i)=><details key={r.reviewer_id+'-'+i} className="app-review-details">
                 <summary>{r.reviewer_email}: {r.recommendation}</summary>
                 <p className="help">Relevance {r.relevance}/5 · Rigour {r.rigour}/5 · Clarity {r.clarity}/5 · Impact {r.impact}/5</p>
                 <p>{r.comments}</p><p className="help">Updated: {new Date(r.updated_at).toLocaleString()}</p>
               </details>):<p className="help">Awaiting review assessment.</p>}
             </td>
-            <td><label className="sr-only" htmlFor={'decision-'+a.id}>Scientific decision for {ref}</label>
+            <td data-label="Committee decision"><label className="sr-only" htmlFor={'decision-'+a.id}>Scientific decision for {ref}</label>
               <select id={'decision-'+a.id} className="app-input-inline" value={a.status} disabled={busy}
                 onChange={e=>void change(a.id,e.target.value,false)}>
                 {['submitted','under_review','accepted','rejected'].map(t=><option key={t} value={t} disabled={['accepted','rejected'].includes(t)&&!myReports.length&&t!==a.status}>{STATUS_LABEL[t]}</option>)}
               </select>
             </td>
-            <td><div className="app-assign-row">
+            <td data-label="Assign reviewer"><div className="app-assign-row">
               <label className="sr-only" htmlFor={'reviewer-'+a.id}>Assign reviewer for {ref}</label>
               <select id={'reviewer-'+a.id} className="app-input-inline" value={reviewerChoices[a.id]||''} disabled={busy}
                 onChange={e=>setChoices(current=>({...current,[a.id]:e.target.value}))}>
@@ -137,7 +137,7 @@ export function OrganiserPanel({registrations,abstracts,reports,assignmentCounts
               <button type="button" className="app-button" disabled={busy||!['submitted','under_review'].includes(a.status)}
                 onClick={()=>void assign(a.id)}>Assign</button>
             </div></td>
-            <td>{a.is_demo?<span className="help">Test record: public release disabled</span>:
+            <td data-label="Public release">{a.is_demo?<span className="help">Test record: public release disabled</span>:
               <label><input type="checkbox" checked={a.is_published} disabled={busy||a.status!=='accepted'}
                 onChange={e=>void change(a.id,a.status,e.target.checked)}/> In public book</label>}
             </td>

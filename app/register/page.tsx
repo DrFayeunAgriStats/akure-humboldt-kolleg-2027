@@ -2,7 +2,7 @@ import Link from 'next/link';
 import {Shell, TestModeNotice} from '@/components/Shell';
 import {RegisterForm} from './form';
 import {getSupabaseServer, currentUser} from '@/lib/supabase/server';
-import {getConferenceSettings, registrationState, registrationReference, formatDeadline} from '@/lib/conference-mode';
+import {participantTestMode, getConferenceSettings, registrationState, registrationReference, formatDeadline} from '@/lib/conference-mode';
 
 export const metadata = {
   title: 'Registration',
@@ -15,6 +15,7 @@ const CATEGORY: Record<string, string> = {student: 'Student', academic: 'Researc
 
 export default async function Page() {
   const settings = await getConferenceSettings();
+  const testing = await participantTestMode(settings);
   const state = registrationState(settings);
   const user = await currentUser();
   let existing: {serial_number: number; full_name: string; institution: string; category: string; created_at: string; is_demo: boolean} | null = null;
@@ -22,12 +23,12 @@ export default async function Page() {
     const db = await getSupabaseServer();
     const r = await db.from('registrations')
       .select('serial_number,full_name,institution,category,created_at,is_demo')
-      .eq('user_id', user.id).eq('is_demo', settings.demo_mode).maybeSingle();
+      .eq('user_id', user.id).eq('is_demo', testing).maybeSingle();
     existing = r.data;
   }
 
   return <Shell title="Registration" kicker="15–18 March 2027 · Free participation" intro="Register once to attend the Kolleg and to submit abstracts. It takes about two minutes."
-    notice={<TestModeNotice show={settings.demo_mode && state === 'open'} />}>
+    notice={<TestModeNotice show={testing && state === 'open'} />}>
     <p className="lead-copy">The Kolleg is fully sponsored. <strong>There is no registration fee</strong> and no payment step.</p>
 
     {existing ? <section className="plain-card summary-card" aria-labelledby="reg-summary">

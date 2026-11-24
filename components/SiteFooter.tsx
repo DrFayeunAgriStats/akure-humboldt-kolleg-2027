@@ -31,7 +31,6 @@ export function SiteFooter() {
           <li><Link href="/register">Registration</Link></li>
           <li><Link href="/submit">Call for abstracts</Link></li>
           <li><Link href="/dashboard">My portal</Link></li>
-          <li><Link href="/login">Sign in</Link></li>
         </ul>
       </nav>
       <div className="footer-col">

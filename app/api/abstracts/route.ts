@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {authorized, error, validText, wordCount, emailSend} from '@/lib/api';
 import {getSupabaseServer} from '@/lib/supabase/server';
-import {getConferenceSettings, submissionState, abstractReference} from '@/lib/conference-mode';
+import {participantTestMode, getConferenceSettings, submissionState, abstractReference} from '@/lib/conference-mode';
 
 const MAX_BYTES = 2 * 1024 * 1024;
 const MIME = {
@@ -26,6 +26,7 @@ const CLOSED_MESSAGE = {
 
 export async function POST(req: NextRequest) {
   const settings = await getConferenceSettings();
+  const testing = await participantTestMode(settings);
   const state = submissionState(settings);
   if (state !== 'open') return error(CLOSED_MESSAGE[state], state === 'unavailable' ? 503 : 403);
 
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
   const file = f.get('file');
   const hasFile = file instanceof File && file.size > 0;
   const track = Number(f.get('track')), presentation = String(f.get('presentation_type'));
-  if (!validText(title, 8, 250) || !validText(author, 3, 160) || !validText(institution, 2, 200) || !validText(keywords, 2, 250))
+  if (!validText(title, 8, 250) || !validText(author, 3, 160) || !validText(institution, 2, 200) || (!validText(keywords, 2, 250) || !String(keywords).split(',').some(word => word.trim())))
     return error('Please complete the title, author, institution and keywords.');
   if (!body && !hasFile) return error('Enter abstract text or upload an abstract file.');
   if (body.length > 5000 || wordCount(body) > 300)
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
   if (!Number.isInteger(track) || track < 1 || track > 5) return error('Please choose one of the five sub-themes.');
   if (presentation !== 'oral' && presentation !== 'poster') return error('Please choose oral or poster presentation.');
 
-  const isTest = settings.demo_mode;
+  const isTest = testing;
   const db = await getSupabaseServer();
   const reg = await db.from('registrations').select('id').eq('user_id', user.id).eq('is_demo', isTest).maybeSingle();
   if (!reg.data) return error('Please register for the Kolleg before submitting an abstract.', 403);
