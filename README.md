@@ -28,7 +28,7 @@ The Local Organising Committee has commissioned this as the official conference 
 
 - `/` — conference landing page, five sub-themes, programme preview, participation and venue.
 - `/register` — authenticated **free** registration; no payment fields.
-- `/submit` — registered participants submit a 250–300-word abstract with optional private PDF/DOC/DOCX attachment.
+- `/submit` — registered participants submit an abstract of up to 300 words as text, a private PDF/DOC/DOCX attachment, or both.
 - `/login`, `/auth/callback` — magic-link authentication.
 - `/dashboard` — participant registration and abstract-status portal.
 - `/dashboard/reviewer` — private peer-review recommendations for assigned abstracts.

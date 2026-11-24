@@ -7,7 +7,7 @@ import {THEMES} from '@/lib/themes';
 
 export const metadata = {
   title: 'Call for abstracts',
-  description: 'Submit a 250–300-word abstract to Akure Humboldt Kolleg 2027 under one of five sub-themes on biodiversity, climate change and food security.',
+  description: 'Submit an abstract of up to 300 words to Akure Humboldt Kolleg 2027 under one of five sub-themes on biodiversity, climate change and food security.',
   alternates: {canonical: '/submit'}
 };
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,7 @@ export default async function Page() {
     registered = Boolean(r.data);
   }
 
-  return <Shell title="Call for abstracts" kicker="Five sub-themes · 250–300 words" intro="Share research on biodiversity, climate change and food security under one of the five scientific sub-themes."
+  return <Shell title="Call for abstracts" kicker="Five sub-themes · Up to 300 words" intro="Share research on biodiversity, climate change and food security under one of the five scientific sub-themes."
     notice={<TestModeNotice show={settings.demo_mode && state === 'open'} />}>
     <div className="guidelines">
       <p className="lead-copy">Submit research under one of the five sub-themes. Submission is free; abstracts stay private unless accepted and released by the scientific committee.</p>
@@ -31,9 +31,9 @@ export default async function Page() {
         <summary>Sub-themes and author guidelines</summary>
         <ol className="theme-list">{THEMES.map((t, i) => <li key={i}>{t}</li>)}</ol>
         <ul>
-          <li>Length: 250–300 words, plain text.</li>
+          <li>Length: up to 300 words. Enter text or upload an abstract document.</li>
           <li>Presenting author must be registered for the Kolleg.</li>
-          <li>Optional attachment: PDF, DOC or DOCX, up to 2 MB, visible only to organisers and assigned reviewers.</li>
+          <li>Attachment: PDF, DOC or DOCX, up to 2 MB, visible only to organisers and assigned reviewers.</li>
           <li>Indicate your preference for an oral or poster presentation.</li>
         </ul>
       </details>

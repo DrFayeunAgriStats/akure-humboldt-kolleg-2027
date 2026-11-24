@@ -36,12 +36,16 @@ export async function POST(req: NextRequest) {
   let f: FormData;
   try { f = await req.formData(); } catch { return error('Invalid form submission.'); }
   const title = f.get('title'), author = f.get('author_name'), institution = f.get('institution');
-  const body = f.get('body'), keywords = f.get('keywords'), coAuthors = f.get('co_authors');
+  const bodyField = f.get('body'), keywords = f.get('keywords'), coAuthors = f.get('co_authors');
+  const body = typeof bodyField === 'string' ? bodyField.trim() : '';
+  const file = f.get('file');
+  const hasFile = file instanceof File && file.size > 0;
   const track = Number(f.get('track')), presentation = String(f.get('presentation_type'));
   if (!validText(title, 8, 250) || !validText(author, 3, 160) || !validText(institution, 2, 200) || !validText(keywords, 2, 250))
     return error('Please complete the title, author, institution and keywords.');
-  if (!validText(body, 20, 5000) || wordCount(String(body)) < 250 || wordCount(String(body)) > 300)
-    return error('The abstract must be 250–300 words.');
+  if (!body && !hasFile) return error('Enter abstract text or upload an abstract file.');
+  if (body.length > 5000 || wordCount(body) > 300)
+    return error('The abstract must not exceed 300 words or 5000 characters.');
   if (!Number.isInteger(track) || track < 1 || track > 5) return error('Please choose one of the five sub-themes.');
   if (presentation !== 'oral' && presentation !== 'poster') return error('Please choose oral or poster presentation.');
 
@@ -51,7 +55,6 @@ export async function POST(req: NextRequest) {
   if (!reg.data) return error('Please register for the Kolleg before submitting an abstract.', 403);
 
   let path: string | null = null;
-  const file = f.get('file');
   if (file instanceof File && file.size) {
     if (file.size > MAX_BYTES) return error('The attachment exceeds 2 MB.');
     const ext = (file.name.split('.').pop() || '').toLowerCase();
@@ -71,7 +74,7 @@ export async function POST(req: NextRequest) {
     email: user.email,
     institution: String(institution).trim(),
     title: String(title).trim(),
-    body: String(body).trim(),
+    body,
     co_authors: typeof coAuthors === 'string' ? coAuthors.trim().slice(0, 500) : '',
     track,
     presentation_type: presentation,
