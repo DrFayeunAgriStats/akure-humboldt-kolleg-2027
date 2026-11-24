@@ -8,7 +8,7 @@ type Session={id:string;title:string;description:string|null;starts_at:string;en
 type Speaker={id:string;name:string;institution:string|null;talk_title:string|null;short_bio:string|null;photo_url:string|null;published:boolean;sort_order:number};
 type SessionForm={id:string;title:string;description:string;starts_at:string;ends_at:string;room:string;session_type:string;published:boolean};
 type SpeakerForm={id:string;name:string;institution:string;talk_title:string;short_bio:string;photo_url:string;published:boolean};
-const newSession:SessionForm={id:'',title:'',description:'',starts_at:'2027-02-22T09:00',ends_at:'2027-02-22T10:00',room:'',session_type:'technical',published:false};
+const newSession:SessionForm={id:'',title:'',description:'',starts_at:'2027-03-16T09:00',ends_at:'2027-03-16T10:00',room:'',session_type:'technical',published:false};
 const newSpeaker:SpeakerForm={id:'',name:'',institution:'',talk_title:'',short_bio:'',photo_url:'',published:false};
 const toWAT=(value:string)=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Africa/Lagos',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(value)).replace(' ','T');
 const fromWAT=(value:string)=>new Date(value+':00+01:00').toISOString();

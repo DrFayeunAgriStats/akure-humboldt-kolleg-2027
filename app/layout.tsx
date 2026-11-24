@@ -11,7 +11,7 @@ const sans = Inter({ subsets: ['latin'], variable: '--font-sans-face', display: 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://akure-humboldt-kolleg-2027.vercel.app';
 const isPublic = process.env.SITE_PUBLIC === 'true';
 const title = `${CONFERENCE.name} — ${CONFERENCE.theme}`;
-const description = 'A Humboldt Kolleg hosted by the Federal University of Technology, Akure (FUTA), 22–25 February 2027. Five scientific sub-themes. Free participation.';
+const description = 'A Humboldt Kolleg hosted by the Federal University of Technology, Akure (FUTA), 15–18 March 2027. Five scientific sub-themes. Free participation.';
 
 export const metadata: Metadata = {
   title: { default: title, template: '%s — Akure Humboldt Kolleg 2027' },

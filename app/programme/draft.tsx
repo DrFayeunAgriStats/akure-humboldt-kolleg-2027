@@ -7,9 +7,9 @@ export function DraftProgramme(){
  const [active,setActive]=useState(0);
  return <section className="plain-card" aria-label="Outline four-day programme">
    <div className="message" role="note"><strong>Outline programme.</strong> Times, sessions and speakers are provisional and will be confirmed by the organising committee.</div>
-   <div className="app-day-tabs" role="tablist" aria-label="Select a conference day">
+   <div className="app-day-tabs" role="tablist" aria-label="Select a programme day">
      {days.map((d,i)=><button key={i} id={'day-tab-'+i} type="button" role="tab" aria-selected={active===i}
-       aria-controls="draft-day-panel" className={active===i?'active':''} onClick={()=>setActive(i)}>Day {i+1}</button>)}
+       aria-controls="draft-day-panel" className={active===i?'active':''} onClick={()=>setActive(i)}>{i === 0 ? 'Pre-conference' : 'Day ' + i}</button>)}
    </div>
    <div role="tabpanel" id="draft-day-panel" aria-labelledby={'day-tab-'+active}>
      <h2>{days[active].date}</h2>

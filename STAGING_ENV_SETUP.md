@@ -17,7 +17,7 @@ Open the selected Akure Humboldt Kolleg project in Vercel. Under Settings → En
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://vfihhakkeoaskfumgsbw.supabase.co` | Public Supabase URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Copy the **publishable key** from the Field-to-Insight Supabase project's API Keys page | Safe for client code; **never** use the service/secret key here |
 | `NEXT_PUBLIC_SITE_URL` | The real deployed HTTPS preview origin | Used for metadata/canonical URLs |
-| `NEXT_PUBLIC_EVENT_START` | `2027-02-22T00:00:00+01:00` | Conference start in Nigeria (WAT) |
+| `NEXT_PUBLIC_EVENT_START` | `2027-03-15T00:00:00+01:00` | Conference start in Nigeria (WAT) |
 | `SITE_PUBLIC` | `false` | Keep preview noindex |
 | `REGISTRATION_OPEN` | `false` | Keep closed until QA and organiser consent |
 | `SUBMISSIONS_OPEN` | `false` | Keep closed until QA and organiser consent |

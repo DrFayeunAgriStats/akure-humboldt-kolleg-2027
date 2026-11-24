@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   const reference = registrationReference(r.data.serial_number, isTest);
   if (user.email) await emailSend(user.email,
     (isTest ? 'Test registration recorded — ' : 'Registration confirmed — ') + reference,
-    `<p>Thank you for registering for Akure Humboldt Kolleg 2027 (22–25 February 2027, FUTA, Akure).</p>
+    `<p>Thank you for registering for Akure Humboldt Kolleg 2027 (15–18 March 2027, FUTA, Akure).</p>
      <p>Your registration reference is <strong>${reference}</strong>. Participation is free.</p>` +
     (isTest ? '<p><strong>Pre-launch test record:</strong> this is not an official registration.</p>' : ''));
   if (process.env.ORGANISER_NOTIFICATION_EMAIL) await emailSend(process.env.ORGANISER_NOTIFICATION_EMAIL,

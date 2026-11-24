@@ -6,7 +6,7 @@ import {getConferenceSettings, registrationState, registrationReference, formatD
 
 export const metadata = {
   title: 'Registration',
-  description: 'Register to attend Akure Humboldt Kolleg 2027 at FUTA, Akure, 22–25 February 2027. Participation is free.',
+  description: 'Register to attend Akure Humboldt Kolleg 2027 at FUTA, Akure, 15–18 March 2027. Participation is free.',
   alternates: {canonical: '/register'}
 };
 export const dynamic = 'force-dynamic';
@@ -26,7 +26,7 @@ export default async function Page() {
     existing = r.data;
   }
 
-  return <Shell title="Registration" kicker="22–25 February 2027 · Free participation" intro="Register once to attend the Kolleg and to submit abstracts. It takes about two minutes."
+  return <Shell title="Registration" kicker="15–18 March 2027 · Free participation" intro="Register once to attend the Kolleg and to submit abstracts. It takes about two minutes."
     notice={<TestModeNotice show={settings.demo_mode && state === 'open'} />}>
     <p className="lead-copy">The Kolleg is fully sponsored. <strong>There is no registration fee</strong> and no payment step.</p>
 

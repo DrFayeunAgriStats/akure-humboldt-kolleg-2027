@@ -32,7 +32,7 @@ export function SiteHeader() {
       <Link href="/" className="brand" aria-label="Akure Humboldt Kolleg 2027 — home">
         <NexusMark size={38} className="brand-mark" />
         <span className="brand-text"><span className="brand-name">Akure Humboldt Kolleg <span className="brand-year">2027</span></span>
-          <span className="brand-meta">22–25 Feb 2027 · FUTA, Akure</span></span>
+          <span className="brand-meta">15–18 Mar 2027 · FUTA, Akure</span></span>
       </Link>
       <button ref={toggleRef} type="button" className="nav-toggle" aria-expanded={open} aria-controls="site-nav"
         onClick={() => setOpen(v => !v)}>

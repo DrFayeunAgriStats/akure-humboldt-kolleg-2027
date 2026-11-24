@@ -24,4 +24,4 @@ insert into public.reviews(assignment_id, reviewer_id, relevance, rigour, clarit
 insert into public.speakers(name, institution, talk_title, short_bio, published, sort_order)
   values ('Sample Speaker', 'FUTA', 'Sample keynote', 'Sample biography.', false, 1);
 insert into public.sessions(title, description, starts_at, ends_at, room, session_type, published)
-  values ('Sample opening session', 'Sample.', '2027-02-22T09:00:00+01', '2027-02-22T10:00:00+01', null, 'keynote', false);
+  values ('Sample opening session', 'Sample.', '2027-03-16T09:00:00+01', '2027-03-16T10:00:00+01', null, 'keynote', false);

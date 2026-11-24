@@ -104,14 +104,14 @@ export function Programme() {
   return <section id="programme" className="section" aria-labelledby="programme-title">
     <div className="container">
       <div className="section-head">
-        <div><p className="kicker">22–25 February 2027</p><h2 id="programme-title">Programme and dates</h2></div>
+        <div><p className="kicker">15–18 March 2027</p><h2 id="programme-title">Programme and dates</h2></div>
         <p>{PROGRAMME.summary}</p>
       </div>
       <ol className="programme-grid" aria-label="Outline of the four days">
-        {OUTLINE_DAYS.map(d => <li key={d.date} className="day">
+        {OUTLINE_DAYS.map((d, i) => <li key={d.date} className="day">
           <span className="day-date">{d.date}</span>
           <h3>{d.theme}</h3>
-          <p>{d.rows.length} outline sessions</p>
+          <p>{i === 0 ? 'Grant-writing workshop' : d.rows.length + ' outline sessions'}</p>
         </li>)}
       </ol>
       <div className="programme-foot">

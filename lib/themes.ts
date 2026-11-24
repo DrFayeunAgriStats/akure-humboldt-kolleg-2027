@@ -5,4 +5,4 @@ export const THEMES=[
 'One Health approaches, human health and food security under climate change',
 'Emerging technologies and innovations for the biodiversity–climate–food nexus'
 ];
-export const EVENT_START=process.env.NEXT_PUBLIC_EVENT_START||'2027-02-22T00:00:00+01:00';
+export const EVENT_START=process.env.NEXT_PUBLIC_EVENT_START||'2027-03-15T00:00:00+01:00';

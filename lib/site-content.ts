@@ -5,8 +5,8 @@ export const CONFERENCE = {
   name: 'Akure Humboldt Kolleg 2027',
   shortName: 'Akure Humboldt Kolleg',
   theme: 'Intersection of Biodiversity Conservation, Climate Change and Food Security: the role of science, innovation and community engagement',
-  dates: '22–25 February 2027',
-  datesLong: 'Monday 22 – Thursday 25 February 2027',
+  dates: '15–18 March 2027',
+  datesLong: 'Monday 15 – Thursday 18 March 2027',
   venue: 'Federal University of Technology, Akure (FUTA)',
   venueShort: 'FUTA, Akure, Nigeria',
   city: 'Akure, Ondo State, Nigeria',
@@ -20,7 +20,7 @@ export const ABOUT = {
     'The scientific programme is being developed around five sub-themes, with research presentations and discussion among scientists and practitioners.'
   ],
   facts: [
-    {value: '4', label: 'Days at FUTA', detail: '22–25 February 2027'},
+    {value: '3', label: 'Conference days', detail: '16–18 March 2027'},
     {value: '5', label: 'Scientific sub-themes', detail: 'From conservation to new technologies'},
     {value: '₦0', label: 'Participation fee', detail: 'No registration or abstract-submission fee'}
   ]
@@ -56,7 +56,7 @@ export const SUBTHEMES = [
 ] as const;
 
 export const PROGRAMME = {
-  summary: 'The programme is being developed to include keynote lectures, research presentations and posters across the five scientific sub-themes.',
+  summary: 'Monday 15 March is for arrival and the pre-conference workshop on grant writing. The three conference days run from Tuesday 16 to Thursday 18 March.',
   note: 'Session times, speakers and the detailed agenda will be published when finalised.',
   caveat: 'Subject to confirmation by the organising committee.'
 } as const;

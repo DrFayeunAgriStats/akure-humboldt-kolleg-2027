@@ -1,7 +1,7 @@
 import {Shell} from '@/components/Shell';
 import {getSupabaseServer,hasConfig} from '@/lib/supabase/server';
 
-export const metadata={title:'Speakers',description:'Keynote and invited speakers at Akure Humboldt Kolleg 2027, FUTA, Akure, 22–25 February 2027.',alternates:{canonical:'/speakers'}};
+export const metadata={title:'Speakers',description:'Keynote and invited speakers at Akure Humboldt Kolleg 2027, FUTA, Akure, 15–18 March 2027.',alternates:{canonical:'/speakers'}};
 export const dynamic='force-dynamic';
 export default async function Page(){
   let speakers:any[]=[];

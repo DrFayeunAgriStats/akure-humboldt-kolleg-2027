@@ -1,6 +1,6 @@
 # Akure Humboldt Kolleg 2027 — Fully Sponsored Conference Platform
 
-Prepared by **Able-Flourish Digital Solutions**. Next.js 16 App Router source based on the approved concept HTML styling, preserving the scientific theme and 22–25 February 2027 dates.
+Prepared by **Able-Flourish Digital Solutions**. Next.js 16 App Router source based on the approved concept HTML styling, preserving the scientific theme and 15–18 March 2027 dates.
 
 **Important:** The conference is **free / fully sponsored**. There is **no Paystack integration, payment gateway, fee table, payment verification, receipt or payment field**. A participant only needs an account and a free registration reference; abstract submission is optional.
 

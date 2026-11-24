@@ -17,7 +17,7 @@ export default function Image() {
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '2px solid #5d8568', paddingTop: 26, fontFamily: 'Arial, sans-serif', fontSize: 23 }}>
-        <div style={{ display: 'flex' }}>22–25 February 2027</div>
+        <div style={{ display: 'flex' }}>15–18 March 2027</div>
         <div style={{ display: 'flex', fontWeight: 700 }}>FUTA · AKURE, NIGERIA</div>
       </div>
     </div>,

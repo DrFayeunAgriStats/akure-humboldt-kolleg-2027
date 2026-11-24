@@ -10,14 +10,14 @@ The user's connected Vercel team `fayeun-lawerences-projects` declined both crea
 2. In Vercel, create/import `akure-humboldt-kolleg-2027` from that repository under an account/team with project creation permission. Choose Next.js framework and set a preview domain.
 3. In Supabase, create a *dedicated* `Akure Humboldt Kolleg 2027` project in the desired organisation. Use this project's own credentials. Do not reuse other products' databases.
 4. Set Vercel environment variables listed below, run clean database migration and verify security. The preview may be deployed with no Supabase credentials, but all real user workflows will remain inactive.
-5. Check the fully sponsored conference banner, theme, 22–25 February 2027 calendar, and five subthemes before sharing a demonstration with the organiser.
+5. Check the fully sponsored conference banner, theme, 15–18 March 2027 calendar, and five subthemes before sharing a demonstration with the organiser.
 
 ## Server configuration
 
 | Variable | Expected value | Notes |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Actual Vercel URL | For canonical URLs and metadata |
-| `NEXT_PUBLIC_EVENT_START` | `2027-02-22T00:00:00+01:00` | WAT countdown |
+| `NEXT_PUBLIC_EVENT_START` | `2027-03-15T00:00:00+01:00` | WAT countdown |
 | `SITE_PUBLIC` | `false` until public launch approved | Site remains noindex while proposed |
 | `NEXT_PUBLIC_SUPABASE_URL` | New conference project URL | Public identifier |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | New project's publishable key | Public key, safe in client |
