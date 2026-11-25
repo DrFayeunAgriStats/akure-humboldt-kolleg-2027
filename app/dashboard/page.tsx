@@ -73,7 +73,9 @@ export default async function Page() {
                 <td>{abstractReference(a.serial_number, a.is_demo)}</td>
                 <td>{a.title}</td>
                 <td>Sub-theme {a.track}</td>
-                <td><span className={'status-pill status-' + a.status}>{STATUS_LABEL[a.status] || a.status}</span></td>
+                <td><span className={'status-pill status-' + a.status}>{STATUS_LABEL[a.status] || a.status}</span>
+                  {a.status === 'revision_requested' && <p><Link href={`/dashboard/abstracts/${a.id}/revise`}>View corrections and revise</Link></p>}
+                </td>
               </tr>)}</tbody>
             </table>
           </div>

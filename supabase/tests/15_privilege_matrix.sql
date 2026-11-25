@@ -58,20 +58,20 @@ select t.ok(not exists (
   'functions: every SECURITY DEFINER function pins search_path');
 select t.ok((select coalesce(array_agg(t.sig(o) order by t.sig(o)), '{}') from t.public_api_function_oids() o
              join pg_proc p on p.oid = o where p.prosecdef and has_function_privilege('authenticated', o, 'EXECUTE'))
-           = (select array_agg(signature order by signature) from t.approved_api_functions()),
-  'functions: the API-callable SECURITY DEFINER set is exactly the five approved signatures');
+           = (select array_agg(a.signature order by a.signature) from t.approved_api_functions() a join pg_proc p on p.oid = a.fn where p.prosecdef),
+  'functions: the API-callable SECURITY DEFINER set is exactly the approved signatures');
 
 -- Guard for FUTURE functions (default privileges cannot keep them private; see
 -- migration 20261118000200 section 5). Uses the shared guard in _helpers.sql, which
 -- matches EXACT signatures: an overload of an approved name is a violation.
 select t.ok((select bool_and(fn is not null) from t.approved_api_functions()),
-  'approved: all five approved signatures exist'
+  'approved: all approved signatures exist'
   || coalesce(' — missing: ' || (select string_agg(signature, ', ') from t.approved_api_functions() where fn is null), ''));
 select t.ok(not exists (select 1 from t.guard_anon_violations()),
   'guard: no function in schema public is executable by anon'
   || coalesce(' — offending: ' || (select string_agg(v, ', ') from t.guard_anon_violations() v), ''));
 select t.ok(not exists (select 1 from t.guard_authenticated_violations()),
-  'guard: authenticated can execute only the five approved signatures in schema public'
+  'guard: authenticated can execute only the approved signatures in schema public'
   || coalesce(' — not approved: ' || (select string_agg(v, ', ') from t.guard_authenticated_violations() v), ''));
 -- Each approved function stays reachable by its intended role (authenticated) and
 -- closed to anon and PUBLIC.
@@ -80,7 +80,7 @@ select t.ok(not exists (
   where not has_function_privilege('authenticated', a.fn, 'EXECUTE')
      or has_function_privilege('anon', a.fn, 'EXECUTE')
      or exists (select 1 from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) x where x.grantee = 0 and x.privilege_type = 'EXECUTE')),
-  'approved: each of the five is executable by authenticated and not by anon or PUBLIC'
+  'approved: each approved function is executable by authenticated and not by anon or PUBLIC'
   || coalesce(' — wrong: ' || (select string_agg(a.signature, ', ') from t.approved_api_functions() a
        where a.fn is not null and (not has_function_privilege('authenticated', a.fn, 'EXECUTE') or has_function_privilege('anon', a.fn, 'EXECUTE'))), ''));
 

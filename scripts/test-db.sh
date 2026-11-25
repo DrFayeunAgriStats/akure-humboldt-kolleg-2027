@@ -9,7 +9,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export PGOPTIONS="-c client_min_messages=warning"   # hide routine NOTICEs, keep errors
-SUITES=(supabase/tests/10_security_boundaries.sql supabase/tests/15_privilege_matrix.sql supabase/tests/16_default_privileges.sql supabase/tests/20_option_a_transition.sql)
+SUITES=(supabase/tests/10_security_boundaries.sql supabase/tests/15_privilege_matrix.sql supabase/tests/16_default_privileges.sql supabase/tests/20_option_a_transition.sql supabase/tests/25_abstract_revisions.sql)
 BASELINE_MAX=20261114000200
 DBS=()
 trap 'for d in "${DBS[@]}"; do dropdb --if-exists "$d"; done' EXIT

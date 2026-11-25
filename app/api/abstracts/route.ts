@@ -1,22 +1,8 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {authorized, error, validText, wordCount, emailSend} from '@/lib/api';
+import {authorized, error, validText, wordCount, emailSend, escapeHtml} from '@/lib/api';
+import {uploadAbstractFile} from '@/lib/abstract-file';
 import {getSupabaseServer} from '@/lib/supabase/server';
 import {participantTestMode, getConferenceSettings, submissionState, abstractReference} from '@/lib/conference-mode';
-
-const MAX_BYTES = 2 * 1024 * 1024;
-const MIME = {
-  pdf: 'application/pdf',
-  doc: 'application/msword',
-  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-} as const;
-type Ext = keyof typeof MIME;
-
-/** Check the file's leading bytes, not just its name. */
-function signatureMatches(ext: Ext, b: Uint8Array) {
-  if (ext === 'pdf') return b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46; // %PDF
-  if (ext === 'docx') return b[0] === 0x50 && b[1] === 0x4b;                                   // PK (zip)
-  return b[0] === 0xd0 && b[1] === 0xcf && b[2] === 0x11 && b[3] === 0xe0;                    // OLE2
-}
 
 const CLOSED_MESSAGE = {
   closed: 'Abstract submission is not open yet.',
@@ -57,14 +43,9 @@ export async function POST(req: NextRequest) {
 
   let path: string | null = null;
   if (file instanceof File && file.size) {
-    if (file.size > MAX_BYTES) return error('The attachment exceeds 2 MB.');
-    const ext = (file.name.split('.').pop() || '').toLowerCase();
-    if (!(ext in MIME)) return error('Only PDF, DOC and DOCX attachments are accepted.');
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    if (!signatureMatches(ext as Ext, bytes)) return error('The attachment does not appear to be a valid ' + ext.toUpperCase() + ' file.');
-    path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-    const upload = await db.storage.from('abstract-files').upload(path, bytes, {contentType: MIME[ext as Ext], upsert: false});
-    if (upload.error) return error('Your attachment could not be uploaded. Please try again.', 500);
+    const upload = await uploadAbstractFile(db, user.id, file);
+    if (upload.error !== undefined) return error(upload.error, upload.status);
+    path = upload.path;
   }
 
   const insertion = await db.from('abstracts').insert({
@@ -95,8 +76,4 @@ export async function POST(req: NextRequest) {
     (isTest ? '<p><strong>Pre-launch test record:</strong> this is not an official submission.</p>'
             : '<p>It will now be screened and peer reviewed. You can follow its status in your conference portal.</p>'));
   return NextResponse.json({reference, receiptEmailAccepted, status: 'submitted', test_record: isTest}, {status: 201});
-}
-
-function escapeHtml(s: string) {
-  return s.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
 }

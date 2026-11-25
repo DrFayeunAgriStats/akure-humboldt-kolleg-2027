@@ -1,10 +1,13 @@
 'use client';
 import {FormEvent,useCallback,useEffect,useMemo,useState} from 'react';
 import {useToast} from '@/components/ToastProvider';
+import {revisionDeadlineLabel,todayInLagos} from '@/lib/revisions';
 import {STATUS_LABEL} from '@/lib/labels';
 import {abstractReference,registrationReference} from '@/lib/conference-mode-shared';
 
-type Abstract={id:string;is_demo:boolean;serial_number:number;title:string;track:number;status:string;author_name:string;institution:string;is_published:boolean};
+type Abstract={id:string;is_demo:boolean;serial_number:number;title:string;track:number;status:string;author_name:string;institution:string;is_published:boolean;updated_at:string;
+  revision_instructions:string|null;revision_due_on:string|null;revision_submitted_at:string|null;
+  revision_response:string|null;revisedBody:string|null;revisedFile:string|null};
 type Registration={id:string;is_demo:boolean;serial_number:number;full_name:string;institution:string;email:string;category:string};
 type Report={abstract_id:string;reviewer_id:string;reviewer_email:string;relevance:number;rigour:number;clarity:number;impact:number;recommendation:string;comments:string;updated_at:string};
 type Count={abstract_id:string;count:number};
@@ -60,23 +63,52 @@ export function OrganiserPanel({registrations,abstracts,reports,assignmentCounts
     try{
       const res=await fetch('/api/organiser/assign-reviewer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({abstract_id,reviewer_id})});
       const data=await res.json();if(!res.ok)throw new Error(data.error||'Assignment failed');
-      setPapers(list=>list.map(a=>a.id===abstract_id?{...a,status:'under_review'}:a));
+      setPapers(list=>list.map(a=>a.id===abstract_id?{...a,status:'under_review',updated_at:data.updatedAt}:a));
       const msg='Reviewer assigned.'+(data.notified?' Email notification sent.':' Email delivery not confirmed.');
       setFeedback(msg);toast(msg,'success');
     }catch(e){toast(e instanceof Error?e.message:'Assignment failed','error');}
     finally{setBusy(false);}
   }
 
-  async function change(id:string,status:string,published:boolean){
+  async function change(paper:Abstract,status:string,published:boolean){
     setBusy(true);
     try{
-      const res=await fetch('/api/organiser/abstract-status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status,is_published:published})});
+      const res=await fetch('/api/organiser/abstract-status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:paper.id,status,is_published:published,version:paper.updated_at})});
       const data=await res.json();if(!res.ok)throw new Error(data.error||'Could not save decision.');
-      setPapers(list=>list.map(a=>a.id===id?{...a,status,is_published:published}:a));
+      setPapers(list=>list.map(a=>a.id===paper.id?{...a,status,is_published:published,updated_at:data.updatedAt}:a));
       const msg='Decision saved.'+(data.notification_required?(data.notified?' Author notified by email.':' Email delivery not confirmed; the author can see the status in their dashboard.'):'');
       setFeedback(msg);toast(msg,'success');
     }catch(e){toast(e instanceof Error?e.message:'Could not save decision.','error');}
     finally{setBusy(false);}
+  }
+
+  async function requestRevision(event:FormEvent<HTMLFormElement>, paper:Abstract) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const instructions = String(form.get('instructions') || '').trim();
+    const due = String(form.get('due') || '') || null;
+    setBusy(true);
+    try {
+      const response = await fetch('/api/organiser/revision-request', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({id:paper.id, version:paper.updated_at, instructions, due})
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not request corrections.');
+      setPapers(list => list.map(a => a.id === paper.id ? {
+        ...a, status:'revision_requested', revision_instructions:instructions,
+        revision_due_on:due, updated_at:data.updatedAt, is_published:false
+      } : a));
+      const message = data.notified ? 'Corrections requested. Author notified by email.'
+        : 'Corrections saved in the author portal. Email delivery could not be confirmed.';
+      setFeedback(message);
+      toast(message, 'success');
+    } catch (error) {
+      toast(error instanceof Error ? error.message : 'Could not request corrections.', 'error');
+    } finally {
+      setBusy(false);
+    }
   }
 
   const bars=[1,2,3,4,5].map(track=>({track,count:papers.filter(a=>a.track===track).length}));
@@ -111,6 +143,7 @@ export function OrganiserPanel({registrations,abstracts,reports,assignmentCounts
           const myReports=reportMap.get(a.id)||[];
           const assigned=assignedMap.get(a.id)||0;
           const ref=abstractReference(a.serial_number,a.is_demo);
+          const revisionOpen = a.status === 'revision_requested';
           return <tr key={a.id}>
             <td data-label="Reference and author"><strong>{ref}</strong><p>{a.title}</p><p className="help">{a.author_name} · {a.institution}</p></td>
             <td data-label="Track">{a.track}</td>
@@ -122,10 +155,29 @@ export function OrganiserPanel({registrations,abstracts,reports,assignmentCounts
               </details>):<p className="help">Awaiting review assessment.</p>}
             </td>
             <td data-label="Committee decision"><label className="sr-only" htmlFor={'decision-'+a.id}>Scientific decision for {ref}</label>
-              <select id={'decision-'+a.id} className="app-input-inline" value={a.status} disabled={busy}
-                onChange={e=>void change(a.id,e.target.value,false)}>
-                {['submitted','under_review','accepted','rejected'].map(t=><option key={t} value={t} disabled={['accepted','rejected'].includes(t)&&!myReports.length&&t!==a.status}>{STATUS_LABEL[t]}</option>)}
+              <select id={'decision-'+a.id} className="app-input-inline" value={a.status} disabled={busy || revisionOpen}
+                onChange={e=>void change(a,e.target.value,false)}>
+                {['submitted','under_review','revision_requested','accepted','rejected'].map(t=><option key={t} value={t} disabled={t==='revision_requested'||(['accepted','rejected'].includes(t)&&!myReports.length&&t!==a.status)}>{STATUS_LABEL[t]}</option>)}
               </select>
+              {a.revision_submitted_at && <details className="app-review-details">
+                <summary>Latest revision received</summary>
+                <p className="help">{new Date(a.revision_submitted_at).toLocaleString('en-GB', {timeZone:'Africa/Lagos'})} WAT</p>
+                {a.revisedBody && <p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{a.revisedBody}</p>}
+                {a.revisedFile && <p><a href={a.revisedFile} target="_blank" rel="noreferrer">Open revised attachment</a></p>}
+                {a.revision_response && <p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}><strong>Author’s summary</strong><br/>{a.revision_response}</p>}
+              </details>}
+              {['submitted','under_review','revision_requested'].includes(a.status) &&
+                <details className="app-review-details">
+                  <summary>{revisionOpen ? 'Edit or resend corrections' : 'Request corrections'}</summary>
+                  {revisionOpen && a.revision_due_on && <p className="help">Due {revisionDeadlineLabel(a.revision_due_on)} (WAT)</p>}
+                  <form className="app-form revision-request-form" onSubmit={event => void requestRevision(event, a)}>
+                    <label>Corrections for the author
+                      <textarea className="revision-note" name="instructions" defaultValue={a.revision_instructions || ''} rows={4} maxLength={4000} required />
+                    </label>
+                    <label>Deadline (optional, WAT)<input name="due" type="date" defaultValue={a.revision_due_on || ''} min={todayInLagos()} /></label>
+                    <button className="app-button" disabled={busy}>{revisionOpen ? 'Send updated request' : 'Send correction request'}</button>
+                  </form>
+                </details>}
             </td>
             <td data-label="Assign reviewer"><div className="app-assign-row">
               <label className="sr-only" htmlFor={'reviewer-'+a.id}>Assign reviewer for {ref}</label>
@@ -139,7 +191,7 @@ export function OrganiserPanel({registrations,abstracts,reports,assignmentCounts
             </div></td>
             <td data-label="Public release">{a.is_demo?<span className="help">Test record: public release disabled</span>:
               <label><input type="checkbox" checked={a.is_published} disabled={busy||a.status!=='accepted'}
-                onChange={e=>void change(a.id,a.status,e.target.checked)}/> In public book</label>}
+                onChange={e=>void change(a,a.status,e.target.checked)}/> In public book</label>}
             </td>
           </tr>;
         })}</tbody>

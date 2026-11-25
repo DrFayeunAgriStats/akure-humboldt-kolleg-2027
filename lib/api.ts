@@ -23,3 +23,7 @@ export async function emailSend(to: string, subject: string, html: string, attac
     body: JSON.stringify({from, to, subject, html, attachments})
   }).then(response => response.ok).catch(() => false);
 }
+
+export function escapeHtml(s: string) {
+  return s.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
+}

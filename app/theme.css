@@ -210,6 +210,9 @@ main:focus { outline: none; }
   border: 1px solid #a3b0a7; border-radius: var(--radius-sm); transition: border-color .15s, box-shadow .15s;
 }
 .app-form textarea { min-height: 220px; line-height: 1.6; resize: vertical; }
+.app-form .revision-note { min-height: 100px; }
+.app-form.revision-request-form { margin-top: .75rem; padding: .75rem; box-shadow: none; }
+.revision-request-form button { min-width: 0; }
 .app-form input:hover, .app-form select:hover, .app-form textarea:hover { border-color: var(--forest-600); }
 .app-form input:focus-visible, .app-form select:focus-visible, .app-form textarea:focus-visible, .app-inline-form input:focus-visible { outline: 3px solid var(--gold-200); outline-offset: 0; border-color: var(--forest-700); }
 .app-form input[aria-invalid="true"] { border-color: var(--danger); }
@@ -244,7 +247,7 @@ main:focus { outline: none; }
 .styled-table tr:last-child td { border-bottom: 0; }
 .styled-table td p { margin: .25rem 0 0; }
 .status-pill { display: inline-block; padding: .2rem .7rem; border-radius: 999px; font-size: .85rem; font-weight: 600; background: var(--forest-50); color: var(--forest-800); white-space: nowrap; }
-.status-under_review { background: #fbf1d9; color: #6a4a0c; }
+.status-under_review, .status-revision_requested { background: #fbf1d9; color: #6a4a0c; }
 .status-accepted { background: var(--success-bg); color: var(--success); }
 .status-rejected { background: var(--danger-bg); color: var(--danger); }
 .app-review-details { margin: .5rem 0; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: .5rem .75rem; }

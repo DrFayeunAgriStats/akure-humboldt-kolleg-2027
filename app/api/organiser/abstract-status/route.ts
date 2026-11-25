@@ -9,7 +9,7 @@ const statuses=['submitted','under_review','accepted','rejected'];
 export async function PATCH(req:NextRequest){
   const user=await requireRole('organiser').catch(()=>null);
   if(!user)return error('Organiser access required.',403);
-  let data:{id?:string;status?:string;is_published?:boolean};
+  let data:{id?:string;status?:string;is_published?:boolean;version?:string};
   try{data=await req.json()}catch{return error('Invalid JSON.')}
   if(!uuid.test(data.id||'')||!statuses.includes(data.status||'')||typeof data.is_published!=='boolean')
     return error('Invalid decision request.');
@@ -17,9 +17,13 @@ export async function PATCH(req:NextRequest){
     return error('Only accepted abstracts can be published.');
   const db=await getSupabaseServer();
   const {data:previous,error:readError}=await db.from('abstracts')
-    .select('id,serial_number,email,status,is_demo,author_name,institution,title')
+    .select('id,serial_number,email,status,is_demo,author_name,institution,title,updated_at')
     .eq('id',data.id!).maybeSingle();
   if(readError||!previous)return error('Abstract not found or inaccessible.',404);
+  if (data.version && data.version !== previous.updated_at)
+    return error('The abstract changed. Refresh the dashboard and try again.',409);
+  if (previous.status === 'revision_requested')
+    return error('The author must submit their revision before you record a decision.', 409);
   if(data.is_published&&previous.is_demo)
     return error('Test records cannot be released publicly.',403);
 
@@ -61,7 +65,7 @@ export async function PATCH(req:NextRequest){
   const r=await db.from('abstracts').update({
     status:data.status,is_published:data.is_published,
     ...(statusChanged && {decision_at: notificationRequired ? issuedAt.toISOString() : null})
-  }).eq('id',data.id!).eq('status',previous.status).select('id').maybeSingle();
+  }).eq('id',data.id!).eq('updated_at',previous.updated_at).select('updated_at').maybeSingle();
   if(r.error)return error('Decision could not be saved.',403);
   if(!r.data)return error('The abstract changed. Refresh the dashboard and try again.',409);
 
@@ -77,5 +81,5 @@ export async function PATCH(req:NextRequest){
       (previous.is_demo ? '<p><strong>Test only:</strong> this is not a formal acceptance or rejection.</p>' : ''),
       attachment);
   }
-  return NextResponse.json({saved:true,notified,notification_required:notificationRequired});
+  return NextResponse.json({saved:true,notified,notification_required:notificationRequired,updatedAt:r.data.updated_at});
 }

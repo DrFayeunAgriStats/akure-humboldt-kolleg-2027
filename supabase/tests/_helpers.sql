@@ -57,7 +57,8 @@ language sql stable as $$
     'public.conference_reviewer_directory()',
     'public.find_conference_account(text)',
     'public.grant_conference_reviewer(text)',
-    'public.revoke_conference_reviewer(uuid)'
+    'public.revoke_conference_reviewer(uuid)',
+    'public.submit_abstract_revision(uuid,uuid,text,text,text,text,boolean)'
   ]) as s
 $$;
 

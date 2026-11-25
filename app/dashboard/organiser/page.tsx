@@ -15,7 +15,7 @@ export default async function Page(){
   const settings=await getConferenceSettings();
   const [regs,abs,regCount,absCount,regTest,absTest,assignments,reviews,directory]=await Promise.all([
     db.from('registrations').select('id,serial_number,full_name,institution,email,category,created_at,is_demo').order('created_at',{ascending:false}).limit(100),
-    db.from('abstracts').select('id,serial_number,title,track,status,author_name,institution,created_at,is_published,is_demo').order('created_at',{ascending:false}).limit(100),
+    db.from('abstracts').select('id,serial_number,title,track,status,author_name,institution,created_at,is_published,is_demo,updated_at,revision_instructions,revision_due_on,revision_submitted_at,revision_response,body,file_path').order('created_at',{ascending:false}).limit(100),
     db.from('registrations').select('id',{head:true,count:'exact'}),
     db.from('abstracts').select('id',{head:true,count:'exact'}),
     db.from('registrations').select('id',{head:true,count:'exact'}).eq('is_demo',true),
@@ -39,6 +39,13 @@ export default async function Page(){
   const assignmentCounts=Object.entries((assignments.data||[]).reduce((acc:Record<string,number>,a)=>{
     acc[a.abstract_id]=(acc[a.abstract_id]||0)+1;return acc;
   },{})).map(([abstract_id,count])=>({abstract_id,count}));
+  const papers = await Promise.all((abs.data || []).map(async ({file_path, body, ...paper}) => {
+    const attachment = paper.revision_submitted_at && file_path
+      ? await db.storage.from('abstract-files').createSignedUrl(file_path, 600)
+      : null;
+    return {...paper, revisedBody: paper.revision_submitted_at ? body : null,
+      revisedFile: attachment?.data?.signedUrl ?? null};
+  }));
   return <Shell title="Organiser control centre" kicker="Organising committee" intro="Launch controls, reviewer access, scientific decisions and exports." wide>
     {settings.demo_mode&&<div className="message warn"><strong>Pre-launch test mode:</strong> registrations, reviews and decisions recorded now are test records. Do not issue formal invitations or acceptance letters based on them.</div>}
     {settings.available?<LaunchControls initial={settings}/>:<div className="message error">Launch settings could not be loaded. Refresh the page.</div>}
@@ -46,7 +53,7 @@ export default async function Page(){
       <div className="plain-card"><span className="eyebrow-small">OFFICIAL REGISTRATIONS</span><h2>{(regCount.count??0)-(regTest.count??0)}</h2><p className="help">{regTest.count??0} test record{(regTest.count??0)===1?'':'s'} kept separately</p></div>
       <div className="plain-card"><span className="eyebrow-small">OFFICIAL ABSTRACTS</span><h2>{(absCount.count??0)-(absTest.count??0)}</h2><p className="help">{absTest.count??0} test record{(absTest.count??0)===1?'':'s'} kept separately</p></div>
       <div className="plain-card"><span className="eyebrow-small">AWAITING DECISION</span>
-        <h2>{(abs.data||[]).filter(x=>x.status==='submitted'||x.status==='under_review').length}</h2>
+        <h2>{(abs.data||[]).filter(x=>['submitted','under_review','revision_requested'].includes(x.status)).length}</h2>
         <p className="help">Among latest 100 abstracts</p></div>
     </div>
     <p className="help">Review decisions are based on saved assessments. CSV exports include official records only. <Link href="/loc-test">Enter LOC testing</Link> to create test registrations and abstracts.</p>
@@ -55,7 +62,7 @@ export default async function Page(){
       <p>Organisers can manage the public programme and speakers without developer access.</p>
       <Link href="/dashboard/organiser/programme" className="app-button">Manage sessions & speakers ↗</Link>
     </div>
-    <OrganiserPanel registrations={regs.data||[]} abstracts={abs.data||[]}
+    <OrganiserPanel registrations={regs.data||[]} abstracts={papers}
       reports={reports} assignmentCounts={assignmentCounts}/>
   </Shell>;
 }
