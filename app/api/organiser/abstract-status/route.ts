@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {error,emailSend} from '@/lib/api';
+import {error,emailSend,type PdfAttachment} from '@/lib/api';
+import {acceptanceLetter} from '@/lib/acceptance-letter';
 import {getSupabaseServer,requireRole} from '@/lib/supabase/server';
 
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -16,13 +17,17 @@ export async function PATCH(req:NextRequest){
     return error('Only accepted abstracts can be published.');
   const db=await getSupabaseServer();
   const {data:previous,error:readError}=await db.from('abstracts')
-    .select('id,serial_number,email,status,is_demo,is_published')
+    .select('id,serial_number,email,status,is_demo,author_name,institution,title')
     .eq('id',data.id!).maybeSingle();
   if(readError||!previous)return error('Abstract not found or inaccessible.',404);
   if(data.is_published&&previous.is_demo)
     return error('Test records cannot be released publicly.',403);
 
-  if((data.status==='accepted'||data.status==='rejected')&&previous.status!==data.status){
+  const statusChanged = previous.status !== data.status;
+  const accepted = data.status === 'accepted';
+  const notificationRequired = statusChanged && (accepted || data.status === 'rejected');
+
+  if(notificationRequired){
     const assignments=await db.from('review_assignments').select('id').eq('abstract_id',data.id!);
     if(assignments.error)return error('Could not check peer-review records.',500);
     const ids=(assignments.data||[]).map(a=>a.id);
@@ -31,22 +36,46 @@ export async function PATCH(req:NextRequest){
     if(reports.error||!reports.data?.length)
       return error('A completed reviewer assessment is required before a scientific decision.',409);
   }
+  const issuedAt = new Date();
+  const ref = (previous.is_demo ? 'DEMO-AKH-ABS-' : 'AKH-ABS-') + String(previous.serial_number).padStart(4, '0');
+  let attachment: PdfAttachment | undefined;
+  if (notificationRequired && accepted) {
+    try {
+      attachment = {
+        filename: `Acceptance-Letter-${ref}.pdf`,
+        content: await acceptanceLetter({
+          author: previous.author_name,
+          institution: previous.institution,
+          title: previous.title,
+          reference: ref,
+          issuedAt,
+          isDemo: previous.is_demo
+        })
+      };
+    } catch (cause) {
+      console.error('Acceptance letter generation failed', cause instanceof Error ? cause.name : 'UNKNOWN_ERROR');
+      return error('The acceptance letter could not be prepared. Please try saving the decision again.', 500);
+    }
+  }
+
   const r=await db.from('abstracts').update({
     status:data.status,is_published:data.is_published,
-    decision_at:['accepted','rejected'].includes(data.status!)?new Date().toISOString():null
+    ...(statusChanged && {decision_at: notificationRequired ? issuedAt.toISOString() : null})
   }).eq('id',data.id!).eq('status',previous.status).select('id').maybeSingle();
   if(r.error)return error('Decision could not be saved.',403);
   if(!r.data)return error('The abstract changed. Refresh the dashboard and try again.',409);
 
-  let notified=false;
-  if(previous.status!==data.status&&['accepted','rejected'].includes(data.status!)){
-    const ref=(previous.is_demo?'DEMO-AKH-ABS-':'AKH-ABS-')+String(previous.serial_number).padStart(4,'0');
-    notified=await emailSend(previous.email,
-      (previous.is_demo?'Test decision — ':'Abstract decision — ')+ref,
-      '<p>The organiser has changed the status of your abstract <strong>'+ref+
-      '</strong> to <strong>'+data.status+'</strong>.</p>'+
-      '<p>Sign in to your conference dashboard to view your updated submission status.</p>'+
-      (previous.is_demo?'<p><strong>Test only:</strong> this is not a formal acceptance or rejection.</p>':''));
+  let notified = false;
+  if (notificationRequired) {
+    const subject = accepted ? 'Abstract acceptance letter' : 'Abstract decision';
+    notified = await emailSend(previous.email,
+      (previous.is_demo ? 'Test: ' : '') + subject + ' — ' + ref,
+      '<p>The organiser has changed the status of your abstract <strong>' + ref +
+      '</strong> to <strong>' + data.status + '</strong>.</p>' +
+      (attachment ? '<p>Your acceptance letter is attached as a PDF.</p>' : '') +
+      '<p>Sign in to your conference dashboard to view your updated submission status.</p>' +
+      (previous.is_demo ? '<p><strong>Test only:</strong> this is not a formal acceptance or rejection.</p>' : ''),
+      attachment);
   }
-  return NextResponse.json({saved:true,notified,notification_required:previous.status!==data.status&&['accepted','rejected'].includes(data.status!)});
+  return NextResponse.json({saved:true,notified,notification_required:notificationRequired});
 }
