@@ -89,12 +89,12 @@ export async function POST(req: NextRequest) {
   }
 
   const reference = abstractReference(insertion.data.serial_number, isTest);
-  if (user.email) await emailSend(user.email,
+  const receiptEmailAccepted = Boolean(user.email) && await emailSend(user.email!,
     (isTest ? 'Test abstract recorded — ' : 'Abstract received — ') + reference,
     `<p>Your abstract "${escapeHtml(String(title).trim())}" has been received. Reference: <strong>${reference}</strong>.</p>` +
     (isTest ? '<p><strong>Pre-launch test record:</strong> this is not an official submission.</p>'
             : '<p>It will now be screened and peer reviewed. You can follow its status in your conference portal.</p>'));
-  return NextResponse.json({reference, status: 'submitted', test_record: isTest}, {status: 201});
+  return NextResponse.json({reference, receiptEmailAccepted, status: 'submitted', test_record: isTest}, {status: 201});
 }
 
 function escapeHtml(s: string) {

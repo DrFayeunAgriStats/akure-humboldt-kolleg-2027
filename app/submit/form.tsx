@@ -1,5 +1,5 @@
 'use client';
-import {useState, FormEvent} from 'react';
+import {useEffect, useRef, useState, FormEvent} from 'react';
 import Link from 'next/link';
 import {THEMES} from '@/lib/themes';
 
@@ -8,6 +8,14 @@ const countWords = (s: string) => s.trim() ? s.trim().split(/\s+/u).length : 0;
 export function AbstractForm() {
   const [body, setBody] = useState('');
   const [reference, setReference] = useState('');
+  const receipt = useRef<HTMLDivElement>(null);
+  const [emailAccepted, setEmailAccepted] = useState(false);
+  useEffect(() => {
+    if (reference && receipt.current) {
+      receipt.current.focus({preventScroll: true});
+      receipt.current.scrollIntoView({block: 'center'});
+    }
+  }, [reference]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const words = countWords(body);
@@ -35,15 +43,19 @@ export function AbstractForm() {
       const res = await fetch('/api/abstracts', {method: 'POST', body: new FormData(e.currentTarget)});
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Submission failed. Please try again.');
+      if (!data.reference) throw new Error('No reference was returned. Check My portal before submitting again.');
+      setEmailAccepted(data.receiptEmailAccepted === true);
       setReference(data.reference);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Submission failed.';
+      const msg = err instanceof TypeError ? 'The connection was interrupted. Check My portal before submitting again.' : err instanceof Error ? err.message : 'Submission failed.';
       setError(msg);
     } finally { setBusy(false); }
   }
 
-  if (reference) return <div className="message success" role="status">
-    <strong>Abstract received.</strong> Your reference is <strong>{reference}</strong>. You will be notified by email when a decision is made; you can follow its status in your portal.
+  if (reference) return <div className="message success" role="status" ref={receipt} tabIndex={-1}>
+    <h2>Your abstract has been submitted successfully.</h2>
+    <p>Submission reference: <strong>{reference}</strong></p>
+    <p>{emailAccepted ? 'Your confirmation email was accepted for sending.' : 'Email confirmation is unavailable. Please keep this reference.'} You can view your submission and its decision in My portal.</p>
     <div className="action-row">
       <Link className="app-button" href="/dashboard">Go to my portal</Link>
       <button type="button" className="app-button app-btn-secondary" onClick={() => { setReference(''); setBody(''); }}>Submit another abstract</button>
